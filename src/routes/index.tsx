@@ -151,12 +151,12 @@ function Navbar() {
           ))}
         </nav>
 
-        <a
-          href="#marcar-sessao"
+        <Link
+          to="/agendar"
           className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
         >
           Marcar Sessão
-        </a>
+        </Link>
       </div>
     </header>
   );
@@ -185,12 +185,12 @@ function Hero() {
             controlo sobre as tuas notas.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-4">
-            <a
-              href="#marcar-sessao"
+            <Link
+              to="/agendar"
               className="rounded-full bg-primary px-7 py-3.5 text-base font-semibold text-primary-foreground shadow-lg shadow-primary/25 transition-transform hover:scale-[1.03]"
             >
               Marcar Sessão
-            </a>
+            </Link>
             <a
               href="#como-funciona"
               className="rounded-full border border-border bg-card px-7 py-3.5 text-base font-semibold text-foreground transition-colors hover:bg-accent"
@@ -358,12 +358,12 @@ function FinalCta() {
               Marca hoje a tua primeira sessão de explicações. A primeira é
               por nossa conta.
             </p>
-            <button
-              type="button"
-              className="mt-8 rounded-full bg-card px-8 py-3.5 text-base font-semibold text-primary shadow-lg transition-transform hover:scale-[1.03]"
+            <Link
+              to="/agendar"
+              className="mt-8 inline-block rounded-full bg-card px-8 py-3.5 text-base font-semibold text-primary shadow-lg transition-transform hover:scale-[1.03]"
             >
               Marcar Sessão
-            </button>
+            </Link>
           </div>
         </div>
       </div>

@@ -10,33 +10,53 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AgendarIndexRouteImport } from './routes/agendar.index'
+import { Route as AgendarDisciplinaRouteImport } from './routes/agendar.$disciplina'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AgendarIndexRoute = AgendarIndexRouteImport.update({
+  id: '/agendar/',
+  path: '/agendar/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AgendarDisciplinaRoute = AgendarDisciplinaRouteImport.update({
+  id: '/agendar/$disciplina',
+  path: '/agendar/$disciplina',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/agendar/$disciplina': typeof AgendarDisciplinaRoute
+  '/agendar/': typeof AgendarIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/agendar/$disciplina': typeof AgendarDisciplinaRoute
+  '/agendar': typeof AgendarIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/agendar/$disciplina': typeof AgendarDisciplinaRoute
+  '/agendar/': typeof AgendarIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/agendar/$disciplina' | '/agendar/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/agendar/$disciplina' | '/agendar'
+  id: '__root__' | '/' | '/agendar/$disciplina' | '/agendar/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AgendarDisciplinaRoute: typeof AgendarDisciplinaRoute
+  AgendarIndexRoute: typeof AgendarIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +68,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/agendar/': {
+      id: '/agendar/'
+      path: '/agendar'
+      fullPath: '/agendar/'
+      preLoaderRoute: typeof AgendarIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/agendar/$disciplina': {
+      id: '/agendar/$disciplina'
+      path: '/agendar/$disciplina'
+      fullPath: '/agendar/$disciplina'
+      preLoaderRoute: typeof AgendarDisciplinaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AgendarDisciplinaRoute: AgendarDisciplinaRoute,
+  AgendarIndexRoute: AgendarIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
