@@ -77,16 +77,39 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "TutorIscte — Explicações com tutores estudantes do ISCTE" },
+      {
+        name: "description",
+        content:
+          "Marca sessões de explicações de Matemática, Programação, Algoritmos e Desenvolvimento Ágil com colegas tutores do ISCTE.",
+      },
+      { name: "author", content: "TutorIscte" },
+      {
+        property: "og:title",
+        content: "TutorIscte — Explicações com tutores estudantes do ISCTE",
+      },
+      {
+        property: "og:description",
+        content:
+          "Aprende melhor com colegas que já lá passaram. Marca a tua sessão de explicações no ISCTE.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
     ],
     links: [
+      {
+        rel: "preconnect",
+        href: "https://fonts.googleapis.com",
+      },
+      {
+        rel: "preconnect",
+        href: "https://fonts.gstatic.com",
+        crossOrigin: "anonymous",
+      },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap",
+      },
       {
         rel: "stylesheet",
         href: appCss,
