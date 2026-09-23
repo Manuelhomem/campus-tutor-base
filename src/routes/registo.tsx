@@ -57,7 +57,7 @@ function RegisterPage() {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const next: Record<string, string> = {};
+    const next: Partial<Record<keyof typeof form, string>> = {};
 
     if (!form.primeiroNome.trim()) next.primeiroNome = "Indica o teu primeiro nome.";
     if (!form.ultimoNome.trim()) next.ultimoNome = "Indica o teu último nome.";

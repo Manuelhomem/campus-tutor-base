@@ -40,7 +40,7 @@ function LoginPage() {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const next: Record<string, string> = {};
+    const next: Partial<Record<keyof typeof form, string>> = {};
 
     if (!form.email.trim()) {
       next.email = "Indica o teu email.";
