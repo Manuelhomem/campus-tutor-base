@@ -32,7 +32,7 @@ const labelClass = "mb-1.5 block text-sm font-medium text-foreground";
 function LoginPage() {
   const navigate = useNavigate();
   const [form, setForm] = useState({ email: "", password: "" });
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [errors, setErrors] = useState<Partial<Record<keyof typeof form, string>>>({});
 
   const set = (field: keyof typeof form) => (
     e: React.ChangeEvent<HTMLInputElement>,

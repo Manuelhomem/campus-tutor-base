@@ -10,12 +10,24 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as RegistoRouteImport } from './routes/registo'
 import { Route as AgendarIndexRouteImport } from './routes/agendar.index'
 import { Route as AgendarDisciplinaRouteImport } from './routes/agendar.$disciplina'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegistoRoute = RegistoRouteImport.update({
+  id: '/registo',
+  path: '/registo',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AgendarIndexRoute = AgendarIndexRouteImport.update({
@@ -31,30 +43,44 @@ const AgendarDisciplinaRoute = AgendarDisciplinaRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/registo': typeof RegistoRoute
   '/agendar/$disciplina': typeof AgendarDisciplinaRoute
   '/agendar/': typeof AgendarIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/registo': typeof RegistoRoute
   '/agendar/$disciplina': typeof AgendarDisciplinaRoute
   '/agendar': typeof AgendarIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/registo': typeof RegistoRoute
   '/agendar/$disciplina': typeof AgendarDisciplinaRoute
   '/agendar/': typeof AgendarIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/agendar/$disciplina' | '/agendar/'
+  fullPaths: '/' | '/login' | '/registo' | '/agendar/$disciplina' | '/agendar/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/agendar/$disciplina' | '/agendar'
-  id: '__root__' | '/' | '/agendar/$disciplina' | '/agendar/'
+  to: '/' | '/login' | '/registo' | '/agendar/$disciplina' | '/agendar'
+  id:
+    | '__root__'
+    | '/'
+    | '/login'
+    | '/registo'
+    | '/agendar/$disciplina'
+    | '/agendar/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  LoginRoute: typeof LoginRoute
+  RegistoRoute: typeof RegistoRoute
   AgendarDisciplinaRoute: typeof AgendarDisciplinaRoute
   AgendarIndexRoute: typeof AgendarIndexRoute
 }
@@ -66,6 +92,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/registo': {
+      id: '/registo'
+      path: '/registo'
+      fullPath: '/registo'
+      preLoaderRoute: typeof RegistoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/agendar/': {
@@ -87,6 +127,8 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  LoginRoute: LoginRoute,
+  RegistoRoute: RegistoRoute,
   AgendarDisciplinaRoute: AgendarDisciplinaRoute,
   AgendarIndexRoute: AgendarIndexRoute,
 }
