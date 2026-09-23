@@ -151,12 +151,20 @@ function Navbar() {
           ))}
         </nav>
 
-        <Link
-          to="/agendar"
-          className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
-        >
-          Marcar Sessão
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link
+            to="/login"
+            className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Entrar
+          </Link>
+          <Link
+            to="/agendar"
+            className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
+          >
+            Marcar Sessão
+          </Link>
+        </div>
       </div>
     </header>
   );
