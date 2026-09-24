@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { BookOpen, GraduationCap, Presentation } from "lucide-react";
 import { useState } from "react";
-import { registerAccount } from "@/lib/auth";
+import { registerAccount, type Modo } from "@/lib/auth";
 import { BOOKING_SUBJECTS, DAYS } from "@/lib/booking-data";
 
 const HOURS = Array.from({ length: 12 }, (_, i) => `${String(i + 9).padStart(2, "0")}:00`);
@@ -59,6 +59,8 @@ function RegisterPage() {
   const [disciplinas, setDisciplinas] = useState<string[]>([]);
   const [bio, setBio] = useState("");
   const [slots, setSlots] = useState<string[]>([]);
+  const [modos, setModos] = useState<Record<string, Modo>>({});
+  const [editing, setEditing] = useState<string | null>(null);
   const toggle = (list: string[], set: (v: string[]) => void, v: string) =>
     set(list.includes(v) ? list.filter((x) => x !== v) : [...list, v]);
 
@@ -100,7 +102,7 @@ function RegisterPage() {
 
     const ok = registerAccount({
       tipo: tipo ?? "aluno",
-      ...(tipo === "tutor" ? { disciplinas, bio: bio.trim(), disponibilidade: slots } : {}),
+      ...(tipo === "tutor" ? { disciplinas, bio: bio.trim(), disponibilidade: slots, disponibilidadeModo: Object.fromEntries(slots.map((k) => [k, modos[k] ?? "Presencial"])) } : {}),
       primeiroNome: form.primeiroNome.trim(),
       ultimoNome: form.ultimoNome.trim(),
       email: form.email,
@@ -211,8 +213,13 @@ function RegisterPage() {
                               const on = slots.includes(k);
                               return (
                                 <td key={k}>
-                                  <button type="button" aria-label={`${d} ${h}`} onClick={() => toggle(slots, setSlots, k)}
-                                    className={`h-7 w-full rounded-md border transition-colors ${on ? "border-primary bg-primary" : "border-border bg-card hover:bg-accent"}`} />
+                                  <button type="button" aria-label={`${d} ${h}`} onClick={() => {
+                                      if (!on) { setSlots([...slots, k]); setModos({ ...modos, [k]: modos[k] ?? "Presencial" }); }
+                                      setEditing(k);
+                                    }}
+                                    className={`h-7 w-full rounded-md border text-[10px] font-semibold transition-colors ${on ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card hover:bg-accent"} ${editing === k ? "ring-2 ring-primary/40 ring-offset-1" : ""}`}>
+                                    {on ? (modos[k] ?? "Presencial")[0] : ""}
+                                  </button>
                                 </td>
                               );
                             })}
@@ -221,6 +228,18 @@ function RegisterPage() {
                       </tbody>
                     </table>
                   </div>
+                  <p className="mt-2 text-xs text-muted-foreground">P = Presencial · O = Online · A = Ambas</p>
+                  {editing && slots.includes(editing) && (
+                    <div className="mt-3 flex flex-wrap items-center gap-2 rounded-xl border border-border bg-accent/60 p-3 text-sm">
+                      <span className="mr-1 font-medium text-foreground">{editing.replace("|", " · ")}:</span>
+                      {(["Presencial", "Online", "Ambas"] as const).map((m) => (
+                        <button key={m} type="button" onClick={() => setModos({ ...modos, [editing]: m })}
+                          className={`rounded-full border px-3 py-1 text-xs font-semibold transition-colors ${modos[editing] === m ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-foreground hover:bg-accent"}`}>{m}</button>
+                      ))}
+                      <button type="button" onClick={() => { setSlots(slots.filter((x) => x !== editing)); setEditing(null); }}
+                        className="ml-auto text-xs font-medium text-destructive hover:underline">Remover</button>
+                    </div>
+                  )}
                   {errors.slots && <p className="mt-1.5 text-xs text-destructive">{errors.slots}</p>}
                 </div>
               </div>

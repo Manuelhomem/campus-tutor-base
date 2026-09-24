@@ -12,7 +12,8 @@ export type Slot = {
   day: string;
   time: string;
   tutor: string;
-  mode: "Presencial" | "Online";
+  mode: "Presencial" | "Online" | "Ambas";
+  tutorEmail?: string;
 };
 
 export type Subject = {
