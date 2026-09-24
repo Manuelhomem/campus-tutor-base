@@ -10,8 +10,11 @@ import {
   Video,
 } from "lucide-react";
 import { DAYS, getSubject, type Slot } from "@/lib/booking-data";
+import { addBooking, getCurrentUser, requireLogin } from "@/lib/auth";
 
 export const Route = createFileRoute("/agendar/$disciplina")({
+  ssr: false,
+  beforeLoad: ({ location }) => requireLogin(location.href),
   head: ({ params }) => {
     const subject = getSubject(params.disciplina);
     const name = subject?.name ?? "Disciplina";
@@ -101,10 +104,10 @@ function SchedulePage() {
                 Marcar outra sessão
               </Link>
               <Link
-                to="/"
+                to="/dashboard"
                 className="rounded-full border border-border bg-card px-6 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-accent"
               >
-                Voltar ao início
+                Ver o meu painel
               </Link>
             </div>
           </div>
@@ -210,7 +213,19 @@ function SchedulePage() {
               <button
                 type="button"
                 disabled={!selected}
-                onClick={() => setConfirmed(selected)}
+                onClick={() => {
+                  if (!selected) return;
+                  const user = getCurrentUser();
+                  if (user)
+                    addBooking(user.email, {
+                      subject: subject.name,
+                      tutor: selected.tutor,
+                      day: selected.day,
+                      time: selected.time,
+                      mode: selected.mode,
+                    });
+                  setConfirmed(selected);
+                }}
                 className="rounded-full bg-primary px-7 py-3 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 Confirmar marcação

@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { GraduationCap } from "lucide-react";
 import { useState } from "react";
+import { registerAccount } from "@/lib/auth";
 
 export const Route = createFileRoute("/registo")({
   head: () => ({
@@ -75,6 +76,18 @@ function RegisterPage() {
     setErrors(next);
     if (Object.keys(next).length > 0) return;
 
+    const ok = registerAccount({
+      primeiroNome: form.primeiroNome.trim(),
+      ultimoNome: form.ultimoNome.trim(),
+      email: form.email,
+      ano: form.ano,
+      curso: form.curso,
+      password: form.password,
+    });
+    if (!ok) {
+      setErrors({ email: "Já existe uma conta com este email." });
+      return;
+    }
     navigate({ to: "/" });
   }
 
