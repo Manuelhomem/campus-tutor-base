@@ -3,12 +3,16 @@ import { useEffect, useState } from "react";
 
 // Simulated auth (no backend): accounts and session live in localStorage.
 export type Account = {
+  tipo?: "aluno" | "tutor";
   primeiroNome: string;
   ultimoNome: string;
   email: string;
   ano: string;
   curso: string;
   password: string;
+  disciplinas?: string[];
+  bio?: string;
+  disponibilidade?: string[]; // "Dia|HH:00"
 };
 
 export type Booking = {

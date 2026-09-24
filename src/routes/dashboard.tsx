@@ -1,6 +1,7 @@
 import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
 import { CalendarDays, GraduationCap, LogOut, Plus, User } from "lucide-react";
 import { getBookings, getCurrentUser, logout, type Booking } from "@/lib/auth";
+import { DAYS } from "@/lib/booking-data";
 
 const MOCK_SESSIONS: Booking[] = [
   { subject: "Matemática", tutor: "Ana Silva", day: "Terça, 29 set", time: "15:00", mode: "Online" },
@@ -80,6 +81,39 @@ function DashboardPage() {
           </Link>
         </div>
 
+        {user.tipo === "tutor" ? (
+          <div className="mt-10 grid gap-6 md:grid-cols-2">
+            <section className="rounded-3xl border border-border bg-card p-6 shadow-sm sm:p-8">
+              <h2 className="font-display text-xl font-semibold text-foreground">Disciplinas que lecionas</h2>
+              <div className="mt-5 flex flex-wrap gap-2">
+                {(user.disciplinas ?? []).map((d) => (
+                  <span key={d} className="rounded-full bg-accent px-3 py-1.5 text-sm font-medium text-primary">{d}</span>
+                ))}
+              </div>
+              {user.bio && <p className="mt-6 text-sm text-muted-foreground">{user.bio}</p>}
+            </section>
+            <section className="rounded-3xl border border-border bg-card p-6 shadow-sm sm:p-8">
+              <h2 className="font-display text-xl font-semibold text-foreground">A tua disponibilidade</h2>
+              <ul className="mt-5 space-y-3">
+                {DAYS.map((d) => {
+                  const hours = (user.disponibilidade ?? [])
+                    .filter((k) => k.startsWith(d + "|"))
+                    .map((k) => k.split("|")[1])
+                    .sort();
+                  if (!hours.length) return null;
+                  return (
+                    <li key={d} className="flex flex-wrap items-center gap-2">
+                      <span className="w-20 text-sm font-semibold text-foreground">{d}</span>
+                      {hours.map((h) => (
+                        <span key={h} className="rounded-md border border-border px-2 py-0.5 text-xs text-muted-foreground">{h}</span>
+                      ))}
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+          </div>
+        ) : (
         <section className="mt-10 rounded-3xl border border-border bg-card p-6 shadow-sm sm:p-8">
           <h2 className="font-display text-xl font-semibold text-foreground">Próximas Sessões</h2>
           <ul className="mt-6 divide-y divide-border">
@@ -106,6 +140,7 @@ function DashboardPage() {
             ))}
           </ul>
         </section>
+        )}
       </main>
     </div>
   );

@@ -1,7 +1,10 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { GraduationCap } from "lucide-react";
+import { BookOpen, GraduationCap, Presentation } from "lucide-react";
 import { useState } from "react";
 import { registerAccount } from "@/lib/auth";
+import { BOOKING_SUBJECTS, DAYS } from "@/lib/booking-data";
+
+const HOURS = Array.from({ length: 12 }, (_, i) => `${String(i + 9).padStart(2, "0")}:00`);
 
 export const Route = createFileRoute("/registo")({
   head: () => ({
@@ -50,7 +53,14 @@ function RegisterPage() {
     password: "",
     confirmarPassword: "",
   });
-  const [errors, setErrors] = useState<Partial<Record<keyof typeof form, string>>>({});
+  const [errors, setErrors] = useState<Partial<Record<keyof typeof form | "disciplinas" | "bio" | "slots", string>>>({});
+  const [tipo, setTipo] = useState<"aluno" | "tutor" | null>(null);
+  const [step, setStep] = useState(1);
+  const [disciplinas, setDisciplinas] = useState<string[]>([]);
+  const [bio, setBio] = useState("");
+  const [slots, setSlots] = useState<string[]>([]);
+  const toggle = (list: string[], set: (v: string[]) => void, v: string) =>
+    set(list.includes(v) ? list.filter((x) => x !== v) : [...list, v]);
 
   const set = (field: keyof typeof form) => (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -58,7 +68,7 @@ function RegisterPage() {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const next: Partial<Record<keyof typeof form, string>> = {};
+    const next: typeof errors = {};
 
     if (!form.primeiroNome.trim()) next.primeiroNome = "Indica o teu primeiro nome.";
     if (!form.ultimoNome.trim()) next.ultimoNome = "Indica o teu último nome.";
@@ -75,8 +85,22 @@ function RegisterPage() {
 
     setErrors(next);
     if (Object.keys(next).length > 0) return;
+    if (tipo === "tutor" && step === 2) {
+      setStep(3);
+      return;
+    }
+    if (tipo === "tutor") {
+      const e2: typeof errors = {};
+      if (disciplinas.length === 0) e2.disciplinas = "Escolhe pelo menos uma disciplina.";
+      if (!bio.trim()) e2.bio = "Escreve uma breve bio.";
+      if (slots.length === 0) e2.slots = "Marca pelo menos um horário disponível.";
+      setErrors(e2);
+      if (Object.keys(e2).length) return;
+    }
 
     const ok = registerAccount({
+      tipo: tipo ?? "aluno",
+      ...(tipo === "tutor" ? { disciplinas, bio: bio.trim(), disponibilidade: slots } : {}),
       primeiroNome: form.primeiroNome.trim(),
       ultimoNome: form.ultimoNome.trim(),
       email: form.email,
@@ -86,6 +110,7 @@ function RegisterPage() {
     });
     if (!ok) {
       setErrors({ email: "Já existe uma conta com este email." });
+      setStep(2);
       return;
     }
     navigate({ to: "/" });
@@ -122,7 +147,85 @@ function RegisterPage() {
             sessões de explicações.
           </p>
 
+          {step === 1 && (
+            <div className="mt-8">
+              <p className="mb-3 text-sm font-medium text-foreground">Passo 1 — Escolhe o teu perfil</p>
+              <div className="grid gap-4 sm:grid-cols-2">
+                {([
+                  ["aluno", "Sou Aluno", "Quero marcar explicações.", BookOpen],
+                  ["tutor", "Sou Tutor", "Quero dar explicações a colegas.", Presentation],
+                ] as const).map(([v, t, d, Icon]) => (
+                  <button
+                    key={v}
+                    type="button"
+                    onClick={() => { setTipo(v); setStep(2); }}
+                    className="rounded-2xl border-2 border-border bg-card p-6 text-left transition-colors hover:border-primary hover:bg-accent"
+                  >
+                    <span className="flex size-11 items-center justify-center rounded-xl bg-accent text-primary"><Icon className="size-5" /></span>
+                    <p className="mt-4 font-display text-lg font-semibold text-foreground">{t}</p>
+                    <p className="mt-1 text-sm text-muted-foreground">{d}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {step > 1 && (
           <form onSubmit={handleSubmit} noValidate className="mt-8 space-y-5">
+            <div className="flex items-center justify-between rounded-xl bg-accent px-4 py-2.5 text-sm">
+              <span className="font-medium text-foreground">
+                Passo {step} de {tipo === "tutor" ? 3 : 2} · {tipo === "tutor" ? "Tutor" : "Aluno"}
+              </span>
+              <button type="button" onClick={() => setStep(step - 1)} className="font-medium text-primary hover:underline">Voltar</button>
+            </div>
+            {step === 3 && (
+              <div className="space-y-6">
+                <div>
+                  <p className={labelClass}>Disciplinas que queres lecionar</p>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    {BOOKING_SUBJECTS.map((s) => (
+                      <label key={s.slug} className="flex cursor-pointer items-center gap-2 rounded-xl border border-border px-3 py-2 text-sm hover:bg-accent">
+                        <input type="checkbox" checked={disciplinas.includes(s.name)} onChange={() => toggle(disciplinas, setDisciplinas, s.name)} className="accent-primary" />
+                        {s.name}
+                      </label>
+                    ))}
+                  </div>
+                  {errors.disciplinas && <p className="mt-1.5 text-xs text-destructive">{errors.disciplinas}</p>}
+                </div>
+                <div>
+                  <label htmlFor="bio" className={labelClass}>Bio / experiência</label>
+                  <textarea id="bio" rows={3} value={bio} onChange={(e) => setBio(e.target.value)} placeholder="Ex: 3º ano, média de 18 a Cálculo, já dei explicações a colegas…" className={inputClass} />
+                  {errors.bio && <p className="mt-1.5 text-xs text-destructive">{errors.bio}</p>}
+                </div>
+                <div>
+                  <p className={labelClass}>Disponibilidade semanal (clica para marcar)</p>
+                  <div className="overflow-x-auto">
+                    <table className="w-full border-separate border-spacing-1 text-xs">
+                      <thead><tr><th></th>{DAYS.map((d) => <th key={d} className="font-medium text-muted-foreground">{d.slice(0, 3)}</th>)}</tr></thead>
+                      <tbody>
+                        {HOURS.map((h) => (
+                          <tr key={h}>
+                            <td className="pr-1 text-muted-foreground">{h}</td>
+                            {DAYS.map((d) => {
+                              const k = `${d}|${h}`;
+                              const on = slots.includes(k);
+                              return (
+                                <td key={k}>
+                                  <button type="button" aria-label={`${d} ${h}`} onClick={() => toggle(slots, setSlots, k)}
+                                    className={`h-7 w-full rounded-md border transition-colors ${on ? "border-primary bg-primary" : "border-border bg-card hover:bg-accent"}`} />
+                                </td>
+                              );
+                            })}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  {errors.slots && <p className="mt-1.5 text-xs text-destructive">{errors.slots}</p>}
+                </div>
+              </div>
+            )}
+            <div className={step === 3 ? "hidden" : "space-y-5"}>
             <div className="grid gap-5 sm:grid-cols-2">
               <div>
                 <label htmlFor="primeiroNome" className={labelClass}>
@@ -257,11 +360,12 @@ function RegisterPage() {
               </div>
             </div>
 
+            </div>
             <button
               type="submit"
               className="w-full rounded-full bg-primary px-6 py-3 text-base font-semibold text-primary-foreground shadow-lg shadow-primary/25 transition-transform hover:scale-[1.02]"
             >
-              Criar Conta
+              {tipo === "tutor" && step === 2 ? "Continuar" : "Criar Conta"}
             </button>
 
             <p className="text-center text-sm text-muted-foreground">
@@ -271,6 +375,7 @@ function RegisterPage() {
               </Link>
             </p>
           </form>
+          )}
         </div>
       </main>
     </div>
