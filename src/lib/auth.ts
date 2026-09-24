@@ -13,7 +13,10 @@ export type Account = {
   disciplinas?: string[];
   bio?: string;
   disponibilidade?: string[]; // "Dia|HH:00"
+  disponibilidadeModo?: Record<string, Modo>;
 };
+
+export type Modo = "Presencial" | "Online" | "Ambas";
 
 export type Booking = {
   subject: string;
@@ -21,7 +24,19 @@ export type Booking = {
   day: string;
   time: string;
   mode: string;
+  student?: string;
+  studentEmail?: string;
+  tutorEmail?: string;
 };
+
+const ALL_BOOKINGS_KEY = "tutoriscte:all-bookings";
+
+export function getTutorSessions(tutor: Account): Booking[] {
+  const name = `${tutor.primeiroNome} ${tutor.ultimoNome}`;
+  return read<Booking[]>(ALL_BOOKINGS_KEY, []).filter(
+    (b) => b.tutorEmail === tutor.email || (!b.tutorEmail && b.tutor === name),
+  );
+}
 
 const ACCOUNTS_KEY = "tutoriscte:accounts";
 const SESSION_KEY = "tutoriscte:session";
@@ -94,6 +109,9 @@ export function addBooking(email: string, b: Booking) {
   const list = getBookings(email);
   list.push(b);
   localStorage.setItem(bookingsKey(email), JSON.stringify(list));
+  const all = read<Booking[]>(ALL_BOOKINGS_KEY, []);
+  all.push({ ...b, studentEmail: email });
+  localStorage.setItem(ALL_BOOKINGS_KEY, JSON.stringify(all));
 }
 
 // Route guard: use with `ssr: false` so it runs in the browser.
