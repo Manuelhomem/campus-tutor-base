@@ -1,8 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight, GraduationCap } from "lucide-react";
 import { BOOKING_SUBJECTS } from "@/lib/booking-data";
+import { requireLogin } from "@/lib/auth";
 
 export const Route = createFileRoute("/agendar/")({
+  ssr: false,
+  beforeLoad: ({ location }) => requireLogin(location.href),
   head: () => ({
     meta: [
       { title: "Escolher disciplina — TutorIscte" },

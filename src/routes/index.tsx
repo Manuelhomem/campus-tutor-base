@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
+import { useCurrentUser } from "@/lib/auth";
 import {
   BookOpenCheck,
   CalendarCheck,
@@ -127,6 +128,7 @@ const FAQS = [
 ];
 
 function Navbar() {
+  const user = useCurrentUser();
   return (
     <header className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
@@ -152,12 +154,21 @@ function Navbar() {
         </nav>
 
         <div className="flex items-center gap-3">
-          <Link
-            to="/login"
-            className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-          >
-            Entrar
-          </Link>
+          {user ? (
+            <Link
+              to="/dashboard"
+              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+            >
+              Olá, {user.primeiroNome}
+            </Link>
+          ) : (
+            <Link
+              to="/login"
+              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+            >
+              Entrar
+            </Link>
+          )}
           <Link
             to="/agendar"
             className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
