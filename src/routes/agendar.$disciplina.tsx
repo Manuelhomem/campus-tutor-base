@@ -240,7 +240,7 @@ function SchedulePage() {
                     addBooking(user.email, {
                       subject: subject.name,
                       tutor: selected.tutor,
-                      tutorEmail: selected.tutorEmail,
+                      ...(selected.tutorEmail ? { tutorEmail: selected.tutorEmail } : {}),
                       student: `${user.primeiroNome} ${user.ultimoNome}`,
                       day: selected.day,
                       time: selected.time,
