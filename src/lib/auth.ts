@@ -62,9 +62,7 @@ export function logout() {
 }
 
 export function getCurrentUser(): Account | null {
-  const email = read<string | null>(SESSION_KEY, null) as unknown;
   const raw = typeof window === "undefined" ? null : localStorage.getItem(SESSION_KEY);
-  void email;
   if (!raw) return null;
   return getAccounts().find((a) => a.email === raw) ?? null;
 }

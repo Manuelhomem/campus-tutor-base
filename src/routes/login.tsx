@@ -1,8 +1,14 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { GraduationCap } from "lucide-react";
+import { GraduationCap, Lock } from "lucide-react";
+import { z } from "zod";
+import { login } from "@/lib/auth";
 import { useState } from "react";
 
 export const Route = createFileRoute("/login")({
+  validateSearch: z.object({
+    redirect: z.string().optional(),
+    motivo: z.string().optional(),
+  }),
   head: () => ({
     meta: [
       { title: "Entrar — TutorIscte" },
@@ -31,6 +37,8 @@ const labelClass = "mb-1.5 block text-sm font-medium text-foreground";
 
 function LoginPage() {
   const navigate = useNavigate();
+  const search = Route.useSearch();
+  const [authError, setAuthError] = useState("");
   const [form, setForm] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState<Partial<Record<keyof typeof form, string>>>({});
 
@@ -50,9 +58,18 @@ function LoginPage() {
     if (!form.password) next.password = "Indica a tua password.";
 
     setErrors(next);
+    setAuthError("");
     if (Object.keys(next).length > 0) return;
 
-    navigate({ to: "/" });
+    if (!login(form.email, form.password)) {
+      setAuthError("Email ou password incorretos, ou esta conta ainda não foi registada.");
+      return;
+    }
+    if (search.redirect && search.redirect.startsWith("/")) {
+      navigate({ href: search.redirect });
+    } else {
+      navigate({ to: "/dashboard" });
+    }
   }
 
   return (
@@ -84,6 +101,18 @@ function LoginPage() {
           <p className="mt-2 text-sm text-muted-foreground">
             Bem-vindo de volta! Entra para gerires as tuas sessões.
           </p>
+
+          {search.motivo === "agendar" && (
+            <div className="mt-6 flex items-start gap-3 rounded-xl border border-primary/30 bg-accent px-4 py-3 text-sm text-foreground">
+              <Lock className="mt-0.5 size-4 shrink-0 text-primary" />
+              Precisas de iniciar sessão para marcar uma explicação.
+            </div>
+          )}
+          {authError && (
+            <div className="mt-6 rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+              {authError}
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} noValidate className="mt-8 space-y-5">
             <div>
