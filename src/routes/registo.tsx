@@ -53,7 +53,7 @@ function RegisterPage() {
     password: "",
     confirmarPassword: "",
   });
-  const [errors, setErrors] = useState<Partial<Record<string, string>>>({});
+  const [errors, setErrors] = useState<Partial<Record<keyof typeof form | "disciplinas" | "bio" | "slots", string>>>({});
   const [tipo, setTipo] = useState<"aluno" | "tutor" | null>(null);
   const [step, setStep] = useState(1);
   const [disciplinas, setDisciplinas] = useState<string[]>([]);
@@ -68,7 +68,7 @@ function RegisterPage() {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const next: Partial<Record<keyof typeof form, string>> = {};
+    const next: typeof errors = {};
 
     if (!form.primeiroNome.trim()) next.primeiroNome = "Indica o teu primeiro nome.";
     if (!form.ultimoNome.trim()) next.ultimoNome = "Indica o teu último nome.";
@@ -90,7 +90,7 @@ function RegisterPage() {
       return;
     }
     if (tipo === "tutor") {
-      const e2: Record<string, string> = {};
+      const e2: typeof errors = {};
       if (disciplinas.length === 0) e2.disciplinas = "Escolhe pelo menos uma disciplina.";
       if (!bio.trim()) e2.bio = "Escreve uma breve bio.";
       if (slots.length === 0) e2.slots = "Marca pelo menos um horário disponível.";
