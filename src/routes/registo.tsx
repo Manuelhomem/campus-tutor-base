@@ -183,6 +183,9 @@ function RegisterPage() {
           )}
 
           {step > 1 && (
+          {confirmMsg && (
+            <p role="status" className="mt-8 rounded-xl border border-primary/30 bg-primary/10 px-4 py-3 text-sm text-foreground">{confirmMsg}</p>
+          )}
           <form onSubmit={handleSubmit} noValidate className="mt-8 space-y-5">
             <div className="flex items-center justify-between rounded-xl bg-accent px-4 py-2.5 text-sm">
               <span className="font-medium text-foreground">
