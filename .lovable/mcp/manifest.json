@@ -1,0 +1,137 @@
+{
+  "version": 1,
+  "sdk_version": "3.0.4",
+  "path": "/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://xvpfqlqtpbbvwsjgsygs.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "tutor-connect-hub",
+      "version": "0.1.0",
+      "title": "Tutor Connect Hub"
+    },
+    "tools": [
+      {
+        "name": "list_subjects",
+        "title": "List subjects",
+        "description": "List the subjects students can book tutoring sessions for.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "type": "object",
+          "properties": {},
+          "additionalProperties": false
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_available_slots",
+        "title": "List available time slots",
+        "description": "List the weekly time slots, tutors and modality (Presencial/Online/Ambas) available for a subject.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "type": "object",
+          "properties": {
+            "subject_slug": {
+              "type": "string",
+              "description": "Subject slug from list_subjects, e.g. 'algoritmos'."
+            }
+          },
+          "required": [
+            "subject_slug"
+          ],
+          "additionalProperties": false
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "book_session",
+        "title": "Book a tutoring session",
+        "description": "Book a tutoring session for the signed-in student in a slot returned by list_available_slots.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "idempotentHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "type": "object",
+          "properties": {
+            "subject_slug": {
+              "type": "string",
+              "description": "Subject slug, e.g. 'matematica'."
+            },
+            "day": {
+              "type": "string",
+              "description": "Weekday as returned by list_available_slots, e.g. 'Terça'."
+            },
+            "time": {
+              "type": "string",
+              "description": "Time as returned by list_available_slots, e.g. '15:00'."
+            },
+            "tutor": {
+              "type": "string",
+              "description": "Tutor name from the slot."
+            },
+            "tutor_id": {
+              "description": "tutor_id from the slot, if any.",
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "mode": {
+              "type": "string",
+              "enum": [
+                "Presencial",
+                "Online"
+              ],
+              "description": "Chosen modality."
+            }
+          },
+          "required": [
+            "subject_slug",
+            "day",
+            "time",
+            "tutor",
+            "mode"
+          ],
+          "additionalProperties": false
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_my_sessions",
+        "title": "List my sessions",
+        "description": "List the signed-in user's tutoring sessions, both as student and as tutor.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "type": "object",
+          "properties": {},
+          "additionalProperties": false
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
