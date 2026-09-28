@@ -14,7 +14,90 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      bookings: {
+        Row: {
+          created_at: string
+          day: string
+          id: string
+          mode: string
+          student_id: string
+          student_name: string
+          subject: string
+          time: string
+          tutor_id: string | null
+          tutor_name: string
+        }
+        Insert: {
+          created_at?: string
+          day: string
+          id?: string
+          mode: string
+          student_id?: string
+          student_name: string
+          subject: string
+          time: string
+          tutor_id?: string | null
+          tutor_name: string
+        }
+        Update: {
+          created_at?: string
+          day?: string
+          id?: string
+          mode?: string
+          student_id?: string
+          student_name?: string
+          subject?: string
+          time?: string
+          tutor_id?: string | null
+          tutor_name?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          ano: string
+          bio: string | null
+          created_at: string
+          curso: string
+          disciplinas: string[]
+          disponibilidade: string[]
+          disponibilidade_modo: Json
+          email: string
+          id: string
+          primeiro_nome: string
+          tipo: string
+          ultimo_nome: string
+        }
+        Insert: {
+          ano?: string
+          bio?: string | null
+          created_at?: string
+          curso?: string
+          disciplinas?: string[]
+          disponibilidade?: string[]
+          disponibilidade_modo?: Json
+          email: string
+          id: string
+          primeiro_nome: string
+          tipo?: string
+          ultimo_nome: string
+        }
+        Update: {
+          ano?: string
+          bio?: string | null
+          created_at?: string
+          curso?: string
+          disciplinas?: string[]
+          disponibilidade?: string[]
+          disponibilidade_modo?: Json
+          email?: string
+          id?: string
+          primeiro_nome?: string
+          tipo?: string
+          ultimo_nome?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
