@@ -7,6 +7,9 @@ import { BOOKING_SUBJECTS, DAYS } from "@/lib/booking-data";
 const HOURS = Array.from({ length: 12 }, (_, i) => `${String(i + 9).padStart(2, "0")}:00`);
 
 export const Route = createFileRoute("/registo")({
+  validateSearch: (s: Record<string, unknown>) => ({
+    redirect: typeof s.redirect === "string" && s.redirect.startsWith("/") && !s.redirect.startsWith("//") ? s.redirect : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Criar Conta — TutorIscte" },
@@ -44,6 +47,8 @@ const labelClass = "mb-1.5 block text-sm font-medium text-foreground";
 
 function RegisterPage() {
   const navigate = useNavigate();
+  const search = Route.useSearch();
+  const [confirmMsg, setConfirmMsg] = useState("");
   const [form, setForm] = useState({
     primeiroNome: "",
     ultimoNome: "",
@@ -68,7 +73,7 @@ function RegisterPage() {
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => setForm((prev) => ({ ...prev, [field]: e.target.value }));
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const next: typeof errors = {};
 
@@ -100,7 +105,7 @@ function RegisterPage() {
       if (Object.keys(e2).length) return;
     }
 
-    const ok = registerAccount({
+    const res = await registerAccount({
       tipo: tipo ?? "aluno",
       ...(tipo === "tutor" ? { disciplinas, bio: bio.trim(), disponibilidade: slots, disponibilidadeModo: Object.fromEntries(slots.map((k) => [k, modos[k] ?? "Presencial"])) } : {}),
       primeiroNome: form.primeiroNome.trim(),
@@ -109,13 +114,18 @@ function RegisterPage() {
       ano: form.ano,
       curso: form.curso,
       password: form.password,
-    });
-    if (!ok) {
-      setErrors({ email: "Já existe uma conta com este email." });
+    }, search.redirect ?? "/dashboard");
+    if (!res.ok) {
+      setErrors({ email: res.error ?? "Não foi possível criar a conta." });
       setStep(2);
       return;
     }
-    navigate({ to: "/" });
+    if (res.needsConfirmation) {
+      setConfirmMsg(`Enviámos um email de confirmação para ${form.email}. Confirma a tua conta para entrar.`);
+      return;
+    }
+    if (search.redirect) window.location.href = search.redirect;
+    else navigate({ to: "/" });
   }
 
   return (
@@ -131,7 +141,7 @@ function RegisterPage() {
             </span>
           </Link>
           <Link
-            to="/login"
+            to="/login" search={{ redirect: search.redirect }}
             className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
           >
             Já tens conta? <span className="text-primary">Entrar</span>
@@ -173,6 +183,9 @@ function RegisterPage() {
           )}
 
           {step > 1 && (
+          {confirmMsg && (
+            <p role="status" className="mt-8 rounded-xl border border-primary/30 bg-primary/10 px-4 py-3 text-sm text-foreground">{confirmMsg}</p>
+          )}
           <form onSubmit={handleSubmit} noValidate className="mt-8 space-y-5">
             <div className="flex items-center justify-between rounded-xl bg-accent px-4 py-2.5 text-sm">
               <span className="font-medium text-foreground">
@@ -389,7 +402,7 @@ function RegisterPage() {
 
             <p className="text-center text-sm text-muted-foreground">
               Já tens conta?{" "}
-              <Link to="/login" className="font-medium text-primary hover:underline">
+              <Link to="/login" search={{ redirect: search.redirect }} className="font-medium text-primary hover:underline">
                 Entrar
               </Link>
             </p>

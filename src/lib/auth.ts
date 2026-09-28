@@ -1,22 +1,26 @@
 import { redirect } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
-// Simulated auth (no backend): accounts and session live in localStorage.
+// Accounts, tutor availability and bookings live in Lovable Cloud.
+// Route guards (`requireLogin`) load the signed-in user's data into an
+// in-memory cache so pages can read it synchronously.
+export type Modo = "Presencial" | "Online" | "Ambas";
+
 export type Account = {
+  id?: string;
   tipo?: "aluno" | "tutor";
   primeiroNome: string;
   ultimoNome: string;
   email: string;
   ano: string;
   curso: string;
-  password: string;
+  password?: string;
   disciplinas?: string[];
   bio?: string;
   disponibilidade?: string[]; // "Dia|HH:00"
   disponibilidadeModo?: Record<string, Modo>;
 };
-
-export type Modo = "Presencial" | "Online" | "Ambas";
 
 export type Booking = {
   subject: string;
@@ -29,94 +33,210 @@ export type Booking = {
   tutorEmail?: string;
 };
 
-const ALL_BOOKINGS_KEY = "tutoriscte:all-bookings";
+type ProfileRow = {
+  id: string;
+  email: string;
+  primeiro_nome: string;
+  ultimo_nome: string;
+  ano: string;
+  curso: string;
+  tipo: string;
+  bio: string | null;
+  disciplinas: string[];
+  disponibilidade: string[];
+  disponibilidade_modo: unknown;
+};
 
-export function getTutorSessions(tutor: Account): Booking[] {
-  const name = `${tutor.primeiroNome} ${tutor.ultimoNome}`;
-  return read<Booking[]>(ALL_BOOKINGS_KEY, []).filter(
-    (b) => b.tutorEmail === tutor.email || (!b.tutorEmail && b.tutor === name),
-  );
+const cache: {
+  user: Account | null;
+  tutors: Account[];
+  myBookings: Booking[];
+  tutorSessions: Booking[];
+} = { user: null, tutors: [], myBookings: [], tutorSessions: [] };
+
+function toAccount(p: ProfileRow): Account {
+  return {
+    id: p.id,
+    tipo: p.tipo === "tutor" ? "tutor" : "aluno",
+    primeiroNome: p.primeiro_nome,
+    ultimoNome: p.ultimo_nome,
+    email: p.email,
+    ano: p.ano,
+    curso: p.curso,
+    bio: p.bio ?? undefined,
+    disciplinas: p.disciplinas ?? [],
+    disponibilidade: p.disponibilidade ?? [],
+    disponibilidadeModo: (p.disponibilidade_modo ?? {}) as Record<string, Modo>,
+  };
 }
 
-const ACCOUNTS_KEY = "tutoriscte:accounts";
-const SESSION_KEY = "tutoriscte:session";
-const bookingsKey = (email: string) => `tutoriscte:bookings:${email}`;
+function profileFromAccount(id: string, a: Account) {
+  return {
+    id,
+    email: a.email,
+    primeiro_nome: a.primeiroNome,
+    ultimo_nome: a.ultimoNome,
+    ano: a.ano,
+    curso: a.curso,
+    tipo: a.tipo ?? "aluno",
+    bio: a.bio ?? null,
+    disciplinas: a.disciplinas ?? [],
+    disponibilidade: a.disponibilidade ?? [],
+    disponibilidade_modo: a.disponibilidadeModo ?? {},
+  };
+}
 
-function read<T>(key: string, fallback: T): T {
-  if (typeof window === "undefined") return fallback;
-  try {
-    const raw = localStorage.getItem(key);
-    return raw ? (JSON.parse(raw) as T) : fallback;
-  } catch {
-    return fallback;
+async function loadProfile(): Promise<Account | null> {
+  const { data: sess } = await supabase.auth.getSession();
+  const authUser = sess.session?.user;
+  if (!authUser) {
+    cache.user = null;
+    return null;
   }
+  const { data } = await supabase.from("profiles").select("*").eq("id", authUser.id).maybeSingle();
+  if (data) {
+    cache.user = toAccount(data as ProfileRow);
+    return cache.user;
+  }
+  // First sign-in after email confirmation: create the profile from sign-up data.
+  const meta = authUser.user_metadata?.account as Account | undefined;
+  if (!meta) {
+    cache.user = null;
+    return null;
+  }
+  const row = profileFromAccount(authUser.id, { ...meta, email: authUser.email ?? meta.email });
+  const { data: created } = await supabase.from("profiles").insert(row).select("*").single();
+  cache.user = created ? toAccount(created as ProfileRow) : null;
+  return cache.user;
+}
+
+async function loadAll() {
+  const user = await loadProfile();
+  if (!user) return null;
+  const [{ data: tutors }, { data: bookings }] = await Promise.all([
+    supabase.from("profiles").select("*").eq("tipo", "tutor"),
+    supabase.from("bookings").select("*").order("created_at"),
+  ]);
+  cache.tutors = (tutors ?? []).map((t) => toAccount(t as ProfileRow));
+  const rows = bookings ?? [];
+  const toBooking = (b: (typeof rows)[number]): Booking => ({
+    subject: b.subject,
+    tutor: b.tutor_name,
+    day: b.day,
+    time: b.time,
+    mode: b.mode,
+    student: b.student_name,
+  });
+  cache.myBookings = rows.filter((b) => b.student_id === user.id).map(toBooking);
+  cache.tutorSessions = rows.filter((b) => b.tutor_id === user.id).map(toBooking);
+  return user;
+}
+
+function notify() {
+  window.dispatchEvent(new Event("tutoriscte-auth"));
 }
 
 export function getAccounts(): Account[] {
-  return read<Account[]>(ACCOUNTS_KEY, []);
+  return cache.tutors;
 }
 
-export function registerAccount(acc: Account): boolean {
-  const accounts = getAccounts();
+export async function registerAccount(
+  acc: Account,
+  redirectPath = "/dashboard",
+): Promise<{ ok: boolean; error?: string; needsConfirmation?: boolean }> {
   const email = acc.email.trim().toLowerCase();
-  if (accounts.some((a) => a.email === email)) return false;
-  accounts.push({ ...acc, email });
-  localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accounts));
-  return true;
+  const { password, ...rest } = acc;
+  const account = { ...rest, email };
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password: password ?? "",
+    options: {
+      emailRedirectTo: `${window.location.origin}${redirectPath}`,
+      data: { account },
+    },
+  });
+  if (error) {
+    const exists = /already/i.test(error.message);
+    return { ok: false, error: exists ? "Já existe uma conta com este email." : error.message };
+  }
+  if (data.user && data.user.identities?.length === 0) {
+    return { ok: false, error: "Já existe uma conta com este email." };
+  }
+  if (!data.session) return { ok: true, needsConfirmation: true };
+  await loadAll();
+  notify();
+  return { ok: true };
 }
 
-export function login(email: string, password: string): Account | null {
-  const acc = getAccounts().find(
-    (a) => a.email === email.trim().toLowerCase() && a.password === password,
-  );
-  if (!acc) return null;
-  localStorage.setItem(SESSION_KEY, acc.email);
-  window.dispatchEvent(new Event("tutoriscte-auth"));
-  return acc;
+export async function login(email: string, password: string): Promise<Account | null> {
+  const { error } = await supabase.auth.signInWithPassword({
+    email: email.trim().toLowerCase(),
+    password,
+  });
+  if (error) return null;
+  const user = await loadAll();
+  notify();
+  return user;
 }
 
-export function logout() {
-  localStorage.removeItem(SESSION_KEY);
-  window.dispatchEvent(new Event("tutoriscte-auth"));
+export async function logout() {
+  await supabase.auth.signOut();
+  cache.user = null;
+  cache.myBookings = [];
+  cache.tutorSessions = [];
+  notify();
 }
 
 export function getCurrentUser(): Account | null {
-  const raw = typeof window === "undefined" ? null : localStorage.getItem(SESSION_KEY);
-  if (!raw) return null;
-  return getAccounts().find((a) => a.email === raw) ?? null;
+  return cache.user;
 }
 
 export function useCurrentUser() {
-  const [user, setUser] = useState<Account | null>(null);
+  const [user, setUser] = useState<Account | null>(cache.user);
   useEffect(() => {
-    const update = () => setUser(getCurrentUser());
-    update();
+    const update = () => setUser(cache.user);
+    loadProfile().then(update);
+    const { data: sub } = supabase.auth.onAuthStateChange(() => {
+      setTimeout(() => loadProfile().then(update), 0);
+    });
     window.addEventListener("tutoriscte-auth", update);
-    window.addEventListener("storage", update);
     return () => {
+      sub.subscription.unsubscribe();
       window.removeEventListener("tutoriscte-auth", update);
-      window.removeEventListener("storage", update);
     };
   }, []);
   return user;
 }
 
-export function getBookings(email: string): Booking[] {
-  return read<Booking[]>(bookingsKey(email), []);
+export function getBookings(_email?: string): Booking[] {
+  return cache.myBookings;
 }
 
-export function addBooking(email: string, b: Booking) {
-  const list = getBookings(email);
-  list.push(b);
-  localStorage.setItem(bookingsKey(email), JSON.stringify(list));
-  const all = read<Booking[]>(ALL_BOOKINGS_KEY, []);
-  all.push({ ...b, studentEmail: email });
-  localStorage.setItem(ALL_BOOKINGS_KEY, JSON.stringify(all));
+export function getTutorSessions(_tutor?: Account): Booking[] {
+  return cache.tutorSessions;
+}
+
+export async function addBooking(_email: string, b: Booking) {
+  const user = cache.user;
+  if (!user?.id) return;
+  const tutorId = b.tutorEmail ? cache.tutors.find((t) => t.email === b.tutorEmail)?.id : undefined;
+  cache.myBookings = [...cache.myBookings, b];
+  await supabase.from("bookings").insert({
+    student_id: user.id,
+    student_name: b.student ?? `${user.primeiroNome} ${user.ultimoNome}`,
+    tutor_id: tutorId ?? null,
+    tutor_name: b.tutor,
+    subject: b.subject,
+    day: b.day,
+    time: b.time,
+    mode: b.mode,
+  });
 }
 
 // Route guard: use with `ssr: false` so it runs in the browser.
-export function requireLogin(href: string) {
-  if (!getCurrentUser()) {
-    throw redirect({ to: "/login", search: { redirect: href, motivo: "agendar" } });
+export async function requireLogin(href: string, motivo: string = "agendar") {
+  const user = await loadAll();
+  if (!user) {
+    throw redirect({ to: "/login", search: { redirect: href, motivo: motivo || undefined } });
   }
 }

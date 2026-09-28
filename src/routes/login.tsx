@@ -46,7 +46,7 @@ function LoginPage() {
     e: React.ChangeEvent<HTMLInputElement>,
   ) => setForm((prev) => ({ ...prev, [field]: e.target.value }));
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const next: Partial<Record<keyof typeof form, string>> = {};
 
@@ -61,7 +61,7 @@ function LoginPage() {
     setAuthError("");
     if (Object.keys(next).length > 0) return;
 
-    if (!login(form.email, form.password)) {
+    if (!(await login(form.email, form.password))) {
       setAuthError("Email ou password incorretos, ou esta conta ainda não foi registada.");
       return;
     }
@@ -85,7 +85,7 @@ function LoginPage() {
             </span>
           </Link>
           <Link
-            to="/registo"
+            to="/registo" search={{ redirect: search.redirect }}
             className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
           >
             Ainda não tens conta? <span className="text-primary">Fazer Registo</span>
@@ -164,7 +164,7 @@ function LoginPage() {
             <p className="text-center text-sm text-muted-foreground">
               Ainda não tens conta?{" "}
               <Link
-                to="/registo"
+                to="/registo" search={{ redirect: search.redirect }}
                 className="font-medium text-primary hover:underline"
               >
                 Fazer Registo
