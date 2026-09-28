@@ -234,9 +234,9 @@ export async function addBooking(_email: string, b: Booking) {
 }
 
 // Route guard: use with `ssr: false` so it runs in the browser.
-export async function requireLogin(href: string) {
+export async function requireLogin(href: string, motivo: string = "agendar") {
   const user = await loadAll();
   if (!user) {
-    throw redirect({ to: "/login", search: { redirect: href, motivo: "agendar" } });
+    throw redirect({ to: "/login", search: { redirect: href, motivo: motivo || undefined } });
   }
 }

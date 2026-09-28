@@ -1,6 +1,6 @@
-import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { CalendarDays, GraduationCap, LogOut, Plus, User } from "lucide-react";
-import { getBookings, getCurrentUser, getTutorSessions, logout, type Booking } from "@/lib/auth";
+import { getBookings, getCurrentUser, getTutorSessions, logout, requireLogin, type Booking } from "@/lib/auth";
 import { DAYS } from "@/lib/booking-data";
 
 const MOCK_SESSIONS: Booking[] = [
@@ -11,9 +11,7 @@ const MOCK_SESSIONS: Booking[] = [
 
 export const Route = createFileRoute("/dashboard")({
   ssr: false,
-  beforeLoad: () => {
-    if (!getCurrentUser()) throw redirect({ to: "/login", search: { redirect: "/dashboard" } });
-  },
+  beforeLoad: () => requireLogin("/dashboard", ""),
   head: () => ({
     meta: [
       { title: "O meu painel — TutorIscte" },
@@ -33,8 +31,8 @@ function DashboardPage() {
   if (!user) return null;
   const sessions = [...getBookings(user.email), ...MOCK_SESSIONS];
 
-  function handleLogout() {
-    logout();
+  async function handleLogout() {
+    await logout();
     navigate({ to: "/login", replace: true });
   }
 
