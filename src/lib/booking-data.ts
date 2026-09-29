@@ -8,6 +8,10 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
+/// Real booking calendar (Cal.com) used to confirm a tutoring session.
+export const CAL_BOOKING_URL =
+  "https://cal.com/manuel-homem-cufgzn/explicacoes";
+
 export type Slot = {
   day: string;
   time: string;

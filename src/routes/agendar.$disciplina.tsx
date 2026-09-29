@@ -5,11 +5,17 @@ import {
   CalendarCheck,
   CheckCircle2,
   Clock,
+  ExternalLink,
   GraduationCap,
   MapPin,
   Video,
 } from "lucide-react";
-import { DAYS, getSubject, type Slot } from "@/lib/booking-data";
+import {
+  CAL_BOOKING_URL,
+  DAYS,
+  getSubject,
+  type Slot,
+} from "@/lib/booking-data";
 import { addBooking, getAccounts, getCurrentUser, requireLogin } from "@/lib/auth";
 
 export const Route = createFileRoute("/agendar/$disciplina")({

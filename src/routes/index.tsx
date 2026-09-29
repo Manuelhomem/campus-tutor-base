@@ -2,11 +2,13 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
 import { useCurrentUser } from "@/lib/auth";
 import { FaqChatbot } from "@/components/FaqChatbot";
+import { CAL_BOOKING_URL } from "@/lib/booking-data";
 import {
   BookOpenCheck,
   CalendarCheck,
   ChevronDown,
   Code2,
+  ExternalLink,
   GraduationCap,
   KanbanSquare,
   ListChecks,
