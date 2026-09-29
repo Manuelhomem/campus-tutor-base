@@ -45,6 +45,7 @@ function SchedulePage() {
   const [selected, setSelected] = useState<Slot | null>(null);
   const [confirmed, setConfirmed] = useState<Slot | null>(null);
   const [chosenMode, setChosenMode] = useState<"Presencial" | "Online">("Presencial");
+
   const allSlots: Slot[] = subject
     ? [
         ...subject.slots,
@@ -54,8 +55,8 @@ function SchedulePage() {
             (a.disponibilidade ?? []).map((k) => {
               const [day, time] = k.split("|");
               return {
-                day,
-                time,
+                day: day ?? "Segunda",
+                time: time ?? "10:00",
                 tutor: `${a.primeiroNome} ${a.ultimoNome}`,
                 tutorEmail: a.email,
                 mode: a.disponibilidadeModo?.[k] ?? "Presencial",
@@ -80,6 +81,9 @@ function SchedulePage() {
       </div>
     );
   }
+
+  const effectiveSelectedMode =
+    selected?.mode === "Ambas" ? chosenMode : (selected?.mode ?? "Presencial");
 
   return (
     <div className="min-h-screen bg-tint">
@@ -113,13 +117,25 @@ function SchedulePage() {
               Sessão marcada!
             </h1>
             <p className="mt-3 text-muted-foreground">
-              {subject.name} com {confirmed.tutor} — {confirmed.day} às {confirmed.time} (
-              {confirmed.mode}). Vais receber a confirmação por email.
+              {subject.name} com{" "}
+              <span className="font-semibold text-foreground">{confirmed.tutor}</span> —{" "}
+              {confirmed.day} às {confirmed.time} (
+              <span className="font-semibold text-foreground">{confirmed.mode}</span>). Vais receber
+              a confirmação por email.
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-3">
+              <a
+                href={CAL_BOOKING_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
+              >
+                Abrir marcação no Cal.com
+                <ExternalLink className="size-4" />
+              </a>
               <Link
                 to="/agendar"
-                className="rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
+                className="rounded-full border border-border bg-card px-6 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-accent"
               >
                 Marcar outra sessão
               </Link>
@@ -166,11 +182,15 @@ function SchedulePage() {
                               type="button"
                               onClick={() => {
                                 setSelected(slot);
-                                setChosenMode("Presencial");
+                                if (slot.mode === "Online") {
+                                  setChosenMode("Online");
+                                } else {
+                                  setChosenMode("Presencial");
+                                }
                               }}
-                              className={`w-full rounded-xl border p-3 text-left transition-colors ${
+                              className={`w-full rounded-xl border p-3 text-left transition-all ${
                                 isSelected
-                                  ? "border-primary bg-primary text-primary-foreground"
+                                  ? "border-primary bg-primary text-primary-foreground shadow-sm ring-2 ring-primary/30"
                                   : "border-border bg-background hover:border-primary/40 hover:bg-accent"
                               }`}
                             >
@@ -179,24 +199,36 @@ function SchedulePage() {
                                 {slot.time}
                               </span>
                               <span
-                                className={`mt-1 block text-xs ${
+                                className={`mt-1 block text-xs font-medium ${
                                   isSelected
-                                    ? "text-primary-foreground/85"
+                                    ? "text-primary-foreground/90"
                                     : "text-muted-foreground"
                                 }`}
                               >
                                 {slot.tutor}
                               </span>
+
+                              {/* Modalidade Badge with icons */}
                               <span
-                                className={`mt-1.5 inline-flex items-center gap-1 text-[11px] ${
+                                className={`mt-2 inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-medium transition-colors ${
                                   isSelected
-                                    ? "text-primary-foreground/85"
-                                    : "text-muted-foreground"
+                                    ? "bg-white/20 text-primary-foreground"
+                                    : slot.mode === "Ambas"
+                                      ? "border border-primary/20 bg-primary/10 text-primary"
+                                      : slot.mode === "Online"
+                                        ? "border border-blue-500/20 bg-blue-500/10 text-blue-600 dark:text-blue-400"
+                                        : "border border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
                                 }`}
                               >
-                                {slot.mode !== "Presencial" && <Video className="size-3" />}
-                                {slot.mode !== "Online" && <MapPin className="size-3" />}
-                                {slot.mode}
+                                {slot.mode === "Presencial" && <MapPin className="size-3" />}
+                                {slot.mode === "Online" && <Video className="size-3" />}
+                                {slot.mode === "Ambas" && (
+                                  <>
+                                    <MapPin className="size-3" />
+                                    <Video className="size-3" />
+                                  </>
+                                )}
+                                <span>{slot.mode}</span>
                               </span>
                             </button>
                           );
@@ -208,62 +240,83 @@ function SchedulePage() {
               })}
             </div>
 
-            <div className="mt-10 flex flex-col items-start justify-between gap-4 rounded-2xl border border-border bg-card p-6 shadow-sm sm:flex-row sm:items-center">
-              <div className="flex flex-wrap items-center gap-3">
+            <div className="mt-10 flex flex-col items-start justify-between gap-6 rounded-2xl border border-border bg-card p-6 shadow-sm md:flex-row md:items-center">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                 <span className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
                   <CalendarCheck className="size-5" />
                 </span>
-                <p className="text-sm text-muted-foreground">
-                  {selected ? (
-                    <>
-                      <span className="font-semibold text-foreground">{selected.tutor}</span> —{" "}
-                      {selected.day} às {selected.time} ({selected.mode})
-                    </>
-                  ) : (
-                    "Seleciona um horário para continuar."
+                <div>
+                  <p className="text-sm text-muted-foreground">
+                    {selected ? (
+                      <>
+                        <span className="font-semibold text-foreground">{selected.tutor}</span> —{" "}
+                        {selected.day} às {selected.time}
+                        <span className="ml-1 inline-flex items-center gap-1 font-semibold text-foreground">
+                          · {effectiveSelectedMode}
+                        </span>
+                      </>
+                    ) : (
+                      "Seleciona um horário para continuar."
+                    )}
+                  </p>
+
+                  {/* If mode is 'Ambas', allow choosing between Presencial and Online */}
+                  {selected?.mode === "Ambas" && (
+                    <div className="mt-2 flex items-center gap-2">
+                      <span className="text-xs font-medium text-foreground">
+                        Escolhe a modalidade:
+                      </span>
+                      <div className="inline-flex gap-1.5 rounded-full border border-border bg-muted/50 p-0.5">
+                        {(["Presencial", "Online"] as const).map((m) => (
+                          <button
+                            key={m}
+                            type="button"
+                            onClick={() => setChosenMode(m)}
+                            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold transition-all ${
+                              chosenMode === m
+                                ? "bg-primary text-primary-foreground shadow-xs"
+                                : "text-muted-foreground hover:text-foreground"
+                            }`}
+                          >
+                            {m === "Presencial" ? (
+                              <MapPin className="size-3" />
+                            ) : (
+                              <Video className="size-3" />
+                            )}
+                            {m}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
                   )}
-                </p>
-                {selected?.mode === "Ambas" && (
-                  <div className="flex gap-1.5">
-                    {(["Presencial", "Online"] as const).map((m) => (
-                      <button
-                        key={m}
-                        type="button"
-                        onClick={() => setChosenMode(m)}
-                        className={`rounded-full border px-3 py-1 text-xs font-semibold transition-colors ${chosenMode === m ? "border-primary bg-primary text-primary-foreground" : "border-border bg-background text-foreground hover:bg-accent"}`}
-                      >
-                        {m}
-                      </button>
-                    ))}
-                  </div>
-                )}
+                </div>
               </div>
+
               <a
                 href={CAL_BOOKING_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-disabled={!selected}
-                onClick={() => {
+                onClick={async () => {
                   if (!selected) return;
                   const user = getCurrentUser();
                   const mode = selected.mode === "Ambas" ? chosenMode : selected.mode;
-                  if (user)
-                    addBooking(user.email, {
+                  if (user) {
+                    await addBooking(user.email, {
                       subject: subject.name,
                       tutor: selected.tutor,
                       ...(selected.tutorEmail ? { tutorEmail: selected.tutorEmail } : {}),
                       student: `${user.primeiroNome} ${user.ultimoNome}`,
+                      studentEmail: user.email,
                       day: selected.day,
                       time: selected.time,
                       mode,
                     });
+                  }
                   setConfirmed({ ...selected, mode });
                 }}
-                className={`inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 ${
-                  selected ? "" : "pointer-events-none opacity-40"
-                }`}
+                className="inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
               >
-                Confirmar marcação
+                {selected ? "Confirmar marcação no Cal.com" : "Abrir agendamento no Cal.com"}
                 <ExternalLink className="size-4" />
               </a>
             </div>

@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight, GraduationCap } from "lucide-react";
 import { BOOKING_SUBJECTS } from "@/lib/booking-data";
-import { requireLogin } from "@/lib/auth";
+import { getAccounts, requireLogin } from "@/lib/auth";
 
 export const Route = createFileRoute("/agendar/")({
   ssr: false,
@@ -60,28 +60,36 @@ function ChooseSubjectPage() {
         </p>
 
         <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {BOOKING_SUBJECTS.map((subject) => (
-            <Link
-              key={subject.slug}
-              to="/agendar/$disciplina"
-              params={{ disciplina: subject.slug }}
-              className="group flex flex-col rounded-2xl border border-border bg-card p-6 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md"
-            >
-              <span className="flex size-12 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-                <subject.icon className="size-6" />
-              </span>
-              <h2 className="mt-5 font-display text-xl font-semibold text-foreground">
-                {subject.name}
-              </h2>
-              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                {subject.description}
-              </p>
-              <span className="mt-5 flex items-center justify-between border-t border-border pt-4 text-sm font-semibold text-primary">
-                {subject.slots.length} horários disponíveis
-                <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
-              </span>
-            </Link>
-          ))}
+          {BOOKING_SUBJECTS.map((subject) => {
+            const tutors = getAccounts().filter((a) => a.tipo === "tutor");
+            const registeredSlots = tutors
+              .filter((t) => t.disciplinas?.includes(subject.name))
+              .reduce((acc, t) => acc + (t.disponibilidade?.length ?? 0), 0);
+            const totalSlots = subject.slots.length + registeredSlots;
+
+            return (
+              <Link
+                key={subject.slug}
+                to="/agendar/$disciplina"
+                params={{ disciplina: subject.slug }}
+                className="group flex flex-col rounded-2xl border border-border bg-card p-6 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md"
+              >
+                <span className="flex size-12 items-center justify-center rounded-xl bg-primary text-primary-foreground">
+                  <subject.icon className="size-6" />
+                </span>
+                <h2 className="mt-5 font-display text-xl font-semibold text-foreground">
+                  {subject.name}
+                </h2>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  {subject.description}
+                </p>
+                <span className="mt-5 flex items-center justify-between border-t border-border pt-4 text-sm font-semibold text-primary">
+                  {totalSlots} horários disponíveis
+                  <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
+                </span>
+              </Link>
+            );
+          })}
         </div>
       </main>
     </div>

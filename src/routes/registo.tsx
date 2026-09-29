@@ -145,7 +145,7 @@ function RegisterPage() {
       return;
     }
     if (search.redirect) window.location.href = search.redirect;
-    else navigate({ to: "/" });
+    else navigate({ to: "/dashboard" });
   }
 
   return (

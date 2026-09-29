@@ -47,6 +47,7 @@ export const Route = createFileRoute("/")({
 const NAV_LINKS = [
   { label: "Como funciona", href: "#como-funciona" },
   { label: "Disciplinas", href: "#disciplinas" },
+  { label: "Agendamento", href: "#agendamento" },
   { label: "FAQ", href: "#faq" },
 ];
 
@@ -205,15 +206,24 @@ function Hero() {
             com tutores estudantes do ISCTE e recupera o controlo sobre as tuas notas.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-4">
+            <a
+              href={CAL_BOOKING_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-base font-semibold text-primary-foreground shadow-lg shadow-primary/25 transition-transform hover:scale-[1.03]"
+            >
+              Agendar no Cal.com
+              <ExternalLink className="size-4" />
+            </a>
             <Link
               to="/agendar"
-              className="rounded-full bg-primary px-7 py-3.5 text-base font-semibold text-primary-foreground shadow-lg shadow-primary/25 transition-transform hover:scale-[1.03]"
+              className="rounded-full border border-border bg-card px-7 py-3.5 text-base font-semibold text-foreground transition-colors hover:bg-accent"
             >
-              Marcar Sessão
+              Escolher disciplina
             </Link>
             <a
               href="#como-funciona"
-              className="rounded-full border border-border bg-card px-7 py-3.5 text-base font-semibold text-foreground transition-colors hover:bg-accent"
+              className="rounded-full px-5 py-3.5 text-base font-medium text-muted-foreground transition-colors hover:text-foreground"
             >
               Como funciona
             </a>
@@ -318,6 +328,23 @@ function Subjects() {
             </article>
           ))}
         </div>
+        <div className="mt-12 flex flex-wrap items-center justify-center gap-4">
+          <a
+            href={CAL_BOOKING_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
+          >
+            Agendar no Cal.com
+            <ExternalLink className="size-4" />
+          </a>
+          <Link
+            to="/agendar"
+            className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-7 py-3.5 text-sm font-semibold text-foreground shadow-sm transition-colors hover:bg-accent"
+          >
+            Ver tutores e horários
+          </Link>
+        </div>
       </div>
     </section>
   );
@@ -356,7 +383,7 @@ function Faq() {
 
 function FinalCta() {
   return (
-    <section id="marcar-sessao" className="scroll-mt-20 pb-20 sm:pb-24">
+    <section id="agendamento" className="scroll-mt-20 pb-20 sm:pb-24">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="relative overflow-hidden rounded-3xl bg-primary px-6 py-16 text-center sm:px-12">
           <div
@@ -369,27 +396,27 @@ function FinalCta() {
               Lugares disponíveis esta semana
             </span>
             <h2 className="mx-auto mt-6 max-w-2xl font-display text-3xl font-bold tracking-tight text-primary-foreground sm:text-4xl">
-              Pronto para melhorar as tuas notas?
+              Pronto para agendar a tua explicação?
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-lg text-primary-foreground/85">
-              Marca hoje a tua primeira sessão de explicações. A primeira é por nossa conta.
+              Marca agora mesmo a tua sessão no Cal.com ou escolhe diretamente a tua disciplina.
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-              <Link
-                to="/agendar"
-                className="inline-block rounded-full bg-card px-8 py-3.5 text-base font-semibold text-primary shadow-lg transition-transform hover:scale-[1.03]"
-              >
-                Marcar Sessão
-              </Link>
               <a
                 href={CAL_BOOKING_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-full border border-white/40 px-8 py-3.5 text-base font-semibold text-primary-foreground transition-colors hover:bg-white/10"
+                className="inline-flex items-center gap-2 rounded-full bg-card px-8 py-3.5 text-base font-semibold text-primary shadow-lg transition-transform hover:scale-[1.03]"
               >
-                Abrir calendário
+                Agendar no Cal.com
                 <ExternalLink className="size-4" />
               </a>
+              <Link
+                to="/agendar"
+                className="inline-flex items-center gap-2 rounded-full border border-white/60 bg-white/10 px-8 py-3.5 text-base font-semibold text-primary-foreground backdrop-blur-sm transition-colors hover:bg-white/20"
+              >
+                Ver horários e tutores
+              </Link>
             </div>
           </div>
         </div>
