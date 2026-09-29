@@ -8,7 +8,7 @@ const HOURS = Array.from({ length: 12 }, (_, i) => `${String(i + 9).padStart(2, 
 
 export const Route = createFileRoute("/registo")({
   validateSearch: (s: Record<string, unknown>) => ({
-    redirect: typeof s.redirect === "string" && s.redirect.startsWith("/") && !s.redirect.startsWith("//") ? s.redirect : undefined,
+    redirect: typeof s["redirect"] === "string" && s["redirect"].startsWith("/") && !s["redirect"].startsWith("//") ? s["redirect"] : undefined,
   }),
   head: () => ({
     meta: [
@@ -182,10 +182,10 @@ function RegisterPage() {
             </div>
           )}
 
-          {step > 1 && (
           {confirmMsg && (
             <p role="status" className="mt-8 rounded-xl border border-primary/30 bg-primary/10 px-4 py-3 text-sm text-foreground">{confirmMsg}</p>
           )}
+          {step > 1 && (
           <form onSubmit={handleSubmit} noValidate className="mt-8 space-y-5">
             <div className="flex items-center justify-between rounded-xl bg-accent px-4 py-2.5 text-sm">
               <span className="font-medium text-foreground">

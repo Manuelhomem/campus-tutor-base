@@ -63,7 +63,7 @@ function toAccount(p: ProfileRow): Account {
     email: p.email,
     ano: p.ano,
     curso: p.curso,
-    bio: p.bio ?? undefined,
+    ...(p.bio ? { bio: p.bio } : {}),
     disciplinas: p.disciplinas ?? [],
     disponibilidade: p.disponibilidade ?? [],
     disponibilidadeModo: (p.disponibilidade_modo ?? {}) as Record<string, Modo>,
@@ -99,7 +99,7 @@ async function loadProfile(): Promise<Account | null> {
     return cache.user;
   }
   // First sign-in after email confirmation: create the profile from sign-up data.
-  const meta = authUser.user_metadata?.account as Account | undefined;
+  const meta = authUser.user_metadata?.["account"] as Account | undefined;
   if (!meta) {
     cache.user = null;
     return null;
