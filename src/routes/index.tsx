@@ -380,12 +380,23 @@ function FinalCta() {
               Marca hoje a tua primeira sessão de explicações. A primeira é
               por nossa conta.
             </p>
-            <Link
-              to="/agendar"
-              className="mt-8 inline-block rounded-full bg-card px-8 py-3.5 text-base font-semibold text-primary shadow-lg transition-transform hover:scale-[1.03]"
-            >
-              Marcar Sessão
-            </Link>
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+              <Link
+                to="/agendar"
+                className="inline-block rounded-full bg-card px-8 py-3.5 text-base font-semibold text-primary shadow-lg transition-transform hover:scale-[1.03]"
+              >
+                Marcar Sessão
+              </Link>
+              <a
+                href={CAL_BOOKING_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-full border border-white/40 px-8 py-3.5 text-base font-semibold text-primary-foreground transition-colors hover:bg-white/10"
+              >
+                Abrir calendário
+                <ExternalLink className="size-4" />
+              </a>
+            </div>
           </div>
         </div>
       </div>

@@ -235,18 +235,23 @@ function SchedulePage() {
                   </div>
                 )}
               </div>
-              <button
-                type="button"
-                disabled={!selected}
+              <a
+                href={CAL_BOOKING_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-disabled={!selected}
                 onClick={() => {
                   if (!selected) return;
                   const user = getCurrentUser();
-                  const mode = selected.mode === "Ambas" ? chosenMode : selected.mode;
+                  const mode =
+                    selected.mode === "Ambas" ? chosenMode : selected.mode;
                   if (user)
                     addBooking(user.email, {
                       subject: subject.name,
                       tutor: selected.tutor,
-                      ...(selected.tutorEmail ? { tutorEmail: selected.tutorEmail } : {}),
+                      ...(selected.tutorEmail
+                        ? { tutorEmail: selected.tutorEmail }
+                        : {}),
                       student: `${user.primeiroNome} ${user.ultimoNome}`,
                       day: selected.day,
                       time: selected.time,
@@ -254,10 +259,13 @@ function SchedulePage() {
                     });
                   setConfirmed({ ...selected, mode });
                 }}
-                className="rounded-full bg-primary px-7 py-3 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-40"
+                className={`inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 ${
+                  selected ? "" : "pointer-events-none opacity-40"
+                }`}
               >
                 Confirmar marcação
-              </button>
+                <ExternalLink className="size-4" />
+              </a>
             </div>
           </>
         )}
