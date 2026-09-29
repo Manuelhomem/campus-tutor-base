@@ -18,7 +18,16 @@ const FAQ_ANSWERS: { keywords: string[]; answer: string }[] = [
       "As primeiras sessões de experimentação são gratuitas. Depois, as sessões têm valores acessíveis pensados para estudantes, com descontos em pacotes de várias sessões.",
   },
   {
-    keywords: ["marco", "marcar", "marcação", "marcacao", "agendar", "agendamento", "remarcar", "cancelar"],
+    keywords: [
+      "marco",
+      "marcar",
+      "marcação",
+      "marcacao",
+      "agendar",
+      "agendamento",
+      "remarcar",
+      "cancelar",
+    ],
     answer:
       'Clica em "Marcar Sessão", escolhe a disciplina e o horário que te der mais jeito, e recebe a confirmação por email. Podes remarcar ou cancelar até 12 horas antes.',
   },
@@ -28,12 +37,33 @@ const FAQ_ANSWERS: { keywords: string[]; answer: string }[] = [
       "As sessões podem ser presenciais ou online! Podes ter a sessão no campus do ISCTE ou por videochamada — decides tu no momento da marcação.",
   },
   {
-    keywords: ["ser tutor", "candidatar", "candidatura", "também", "tambem", "ensinar", "dar explicações", "dar explicacoes"],
+    keywords: [
+      "ser tutor",
+      "candidatar",
+      "candidatura",
+      "também",
+      "tambem",
+      "ensinar",
+      "dar explicações",
+      "dar explicacoes",
+    ],
     answer:
       "Sim, podes ser tutor! Se aprovaste disciplinas com boas notas e gostas de ajudar colegas, candidata-te pelo mesmo botão de agendamento — a equipa entra em contacto contigo.",
   },
   {
-    keywords: ["disciplina", "disciplinas", "cadeira", "cadeiras", "matemática", "matematica", "programação", "programacao", "algoritmos", "ágil", "agil"],
+    keywords: [
+      "disciplina",
+      "disciplinas",
+      "cadeira",
+      "cadeiras",
+      "matemática",
+      "matematica",
+      "programação",
+      "programacao",
+      "algoritmos",
+      "ágil",
+      "agil",
+    ],
     answer:
       "Temos tutores para Matemática, Programação, Algoritmos e Desenvolvimento Ágil — as cadeiras onde os estudantes mais precisam de ajuda.",
   },
@@ -95,9 +125,7 @@ export function FaqChatbot() {
               <GraduationCap className="size-5" />
             </span>
             <div>
-              <p className="text-sm font-semibold text-primary-foreground">
-                Assistente TutorIscte
-              </p>
+              <p className="text-sm font-semibold text-primary-foreground">Assistente TutorIscte</p>
               <p className="text-xs text-primary-foreground/80">
                 Responde com base nas perguntas frequentes
               </p>

@@ -3,14 +3,16 @@ import { useState } from "react";
 import { GraduationCap } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
-type OAuthResult = { data: any; error: { message: string } | null };
-const oauth = (supabase.auth as unknown as {
-  oauth: {
-    getAuthorizationDetails: (id: string) => Promise<OAuthResult>;
-    approveAuthorization: (id: string) => Promise<OAuthResult>;
-    denyAuthorization: (id: string) => Promise<OAuthResult>;
-  };
-}).oauth;
+type OAuthResult = { data: unknown; error: { message: string } | null };
+const oauth = (
+  supabase.auth as unknown as {
+    oauth: {
+      getAuthorizationDetails: (id: string) => Promise<OAuthResult>;
+      approveAuthorization: (id: string) => Promise<OAuthResult>;
+      denyAuthorization: (id: string) => Promise<OAuthResult>;
+    };
+  }
+).oauth;
 
 export const Route = createFileRoute("/.lovable/oauth/consent")({
   ssr: false,
@@ -22,7 +24,10 @@ export const Route = createFileRoute("/.lovable/oauth/consent")({
       { title: "Autorizar ligação — TutorIscte" },
       { name: "description", content: "Autoriza um assistente a aceder à tua conta TutorIscte." },
       { property: "og:title", content: "Autorizar ligação — TutorIscte" },
-      { property: "og:description", content: "Autoriza um assistente a aceder à tua conta TutorIscte." },
+      {
+        property: "og:description",
+        content: "Autoriza um assistente a aceder à tua conta TutorIscte.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -31,7 +36,10 @@ export const Route = createFileRoute("/.lovable/oauth/consent")({
     if (!search.authorization_id) throw new Error("Pedido de autorização inválido.");
     const { data } = await supabase.auth.getSession();
     if (!data.session) {
-      throw redirect({ to: "/login", search: { redirect: location.pathname + location.searchStr } });
+      throw redirect({
+        to: "/login",
+        search: { redirect: location.pathname + location.searchStr },
+      });
     }
   },
   loader: async ({ location }) => {
@@ -63,9 +71,17 @@ function Consent() {
     const { data, error } = approve
       ? await oauth.approveAuthorization(authorization_id)
       : await oauth.denyAuthorization(authorization_id);
-    if (error) { setBusy(false); setError(error.message); return; }
+    if (error) {
+      setBusy(false);
+      setError(error.message);
+      return;
+    }
     const target = data?.redirect_url ?? data?.redirect_to;
-    if (!target) { setBusy(false); setError("Não foi recebido nenhum endereço de retorno."); return; }
+    if (!target) {
+      setBusy(false);
+      setError("Não foi recebido nenhum endereço de retorno.");
+      return;
+    }
     window.location.href = target;
   }
 
@@ -79,16 +95,35 @@ function Consent() {
           Ligar {client} ao TutorIscte
         </h1>
         <p className="mt-3 text-sm text-muted-foreground">
-          {client} poderá ver disciplinas e horários, marcar sessões e consultar as tuas sessões em teu nome.
+          {client} poderá ver disciplinas e horários, marcar sessões e consultar as tuas sessões em
+          teu nome.
         </p>
-        {email && <p className="mt-4 text-sm text-foreground">Sessão iniciada como <strong>{email}</strong></p>}
-        <p className="mt-2 text-xs text-muted-foreground">Partilha o teu perfil básico e email. As permissões da app continuam a aplicar-se.</p>
-        {error && <p role="alert" className="mt-4 text-sm text-destructive">{error}</p>}
+        {email && (
+          <p className="mt-4 text-sm text-foreground">
+            Sessão iniciada como <strong>{email}</strong>
+          </p>
+        )}
+        <p className="mt-2 text-xs text-muted-foreground">
+          Partilha o teu perfil básico e email. As permissões da app continuam a aplicar-se.
+        </p>
+        {error && (
+          <p role="alert" className="mt-4 text-sm text-destructive">
+            {error}
+          </p>
+        )}
         <div className="mt-8 flex gap-3">
-          <button disabled={busy} onClick={() => decide(true)} className="flex-1 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground disabled:opacity-60">
+          <button
+            disabled={busy}
+            onClick={() => decide(true)}
+            className="flex-1 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground disabled:opacity-60"
+          >
             Autorizar
           </button>
-          <button disabled={busy} onClick={() => decide(false)} className="flex-1 rounded-full border border-border px-5 py-3 text-sm font-semibold text-foreground disabled:opacity-60">
+          <button
+            disabled={busy}
+            onClick={() => decide(false)}
+            className="flex-1 rounded-full border border-border px-5 py-3 text-sm font-semibold text-foreground disabled:opacity-60"
+          >
             Cancelar ligação
           </button>
         </div>

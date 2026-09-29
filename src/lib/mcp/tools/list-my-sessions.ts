@@ -25,6 +25,9 @@ export default defineTool({
       time: b.time,
       mode: b.mode,
     }));
-    return { content: [{ type: "text", text: JSON.stringify(sessions) }], structuredContent: { sessions } };
+    return {
+      content: [{ type: "text", text: JSON.stringify(sessions) }],
+      structuredContent: { sessions },
+    };
   },
 });

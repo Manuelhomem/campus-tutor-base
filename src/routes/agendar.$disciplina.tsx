@@ -10,12 +10,7 @@ import {
   MapPin,
   Video,
 } from "lucide-react";
-import {
-  CAL_BOOKING_URL,
-  DAYS,
-  getSubject,
-  type Slot,
-} from "@/lib/booking-data";
+import { CAL_BOOKING_URL, DAYS, getSubject, type Slot } from "@/lib/booking-data";
 import { addBooking, getAccounts, getCurrentUser, requireLogin } from "@/lib/auth";
 
 export const Route = createFileRoute("/agendar/$disciplina")({
@@ -58,7 +53,13 @@ function SchedulePage() {
           .flatMap((a) =>
             (a.disponibilidade ?? []).map((k) => {
               const [day, time] = k.split("|");
-              return { day, time, tutor: `${a.primeiroNome} ${a.ultimoNome}`, tutorEmail: a.email, mode: a.disponibilidadeModo?.[k] ?? "Presencial" } as Slot;
+              return {
+                day,
+                time,
+                tutor: `${a.primeiroNome} ${a.ultimoNome}`,
+                tutorEmail: a.email,
+                mode: a.disponibilidadeModo?.[k] ?? "Presencial",
+              } as Slot;
             }),
           ),
       ]
@@ -112,9 +113,8 @@ function SchedulePage() {
               Sessão marcada!
             </h1>
             <p className="mt-3 text-muted-foreground">
-              {subject.name} com {confirmed.tutor} — {confirmed.day} às{" "}
-              {confirmed.time} ({confirmed.mode}). Vais receber a confirmação
-              por email.
+              {subject.name} com {confirmed.tutor} — {confirmed.day} às {confirmed.time} (
+              {confirmed.mode}). Vais receber a confirmação por email.
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-3">
               <Link
@@ -138,26 +138,22 @@ function SchedulePage() {
               Horários de {subject.name}
             </h1>
             <p className="mt-3 max-w-xl text-lg text-muted-foreground">
-              Escolhe o horário que te der mais jeito e confirma a marcação com
-              o tutor.
+              Escolhe o horário que te der mais jeito e confirma a marcação com o tutor.
             </p>
 
             <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
               {DAYS.map((day) => {
-                const slots = allSlots.filter((s) => s.day === day).sort((a, b) => a.time.localeCompare(b.time));
+                const slots = allSlots
+                  .filter((s) => s.day === day)
+                  .sort((a, b) => a.time.localeCompare(b.time));
                 return (
-                  <div
-                    key={day}
-                    className="rounded-2xl border border-border bg-card p-4 shadow-sm"
-                  >
+                  <div key={day} className="rounded-2xl border border-border bg-card p-4 shadow-sm">
                     <h2 className="font-display text-sm font-semibold uppercase tracking-wide text-foreground">
                       {day}
                     </h2>
                     <div className="mt-3 space-y-2">
                       {slots.length === 0 ? (
-                        <p className="text-xs text-muted-foreground">
-                          Sem horários
-                        </p>
+                        <p className="text-xs text-muted-foreground">Sem horários</p>
                       ) : (
                         slots.map((slot) => {
                           const isSelected =
@@ -168,7 +164,10 @@ function SchedulePage() {
                             <button
                               key={`${slot.day}-${slot.time}-${slot.tutor}`}
                               type="button"
-                              onClick={() => { setSelected(slot); setChosenMode("Presencial"); }}
+                              onClick={() => {
+                                setSelected(slot);
+                                setChosenMode("Presencial");
+                              }}
                               className={`w-full rounded-xl border p-3 text-left transition-colors ${
                                 isSelected
                                   ? "border-primary bg-primary text-primary-foreground"
@@ -217,10 +216,8 @@ function SchedulePage() {
                 <p className="text-sm text-muted-foreground">
                   {selected ? (
                     <>
-                      <span className="font-semibold text-foreground">
-                        {selected.tutor}
-                      </span>{" "}
-                      — {selected.day} às {selected.time} ({selected.mode})
+                      <span className="font-semibold text-foreground">{selected.tutor}</span> —{" "}
+                      {selected.day} às {selected.time} ({selected.mode})
                     </>
                   ) : (
                     "Seleciona um horário para continuar."
@@ -229,8 +226,14 @@ function SchedulePage() {
                 {selected?.mode === "Ambas" && (
                   <div className="flex gap-1.5">
                     {(["Presencial", "Online"] as const).map((m) => (
-                      <button key={m} type="button" onClick={() => setChosenMode(m)}
-                        className={`rounded-full border px-3 py-1 text-xs font-semibold transition-colors ${chosenMode === m ? "border-primary bg-primary text-primary-foreground" : "border-border bg-background text-foreground hover:bg-accent"}`}>{m}</button>
+                      <button
+                        key={m}
+                        type="button"
+                        onClick={() => setChosenMode(m)}
+                        className={`rounded-full border px-3 py-1 text-xs font-semibold transition-colors ${chosenMode === m ? "border-primary bg-primary text-primary-foreground" : "border-border bg-background text-foreground hover:bg-accent"}`}
+                      >
+                        {m}
+                      </button>
                     ))}
                   </div>
                 )}
@@ -243,15 +246,12 @@ function SchedulePage() {
                 onClick={() => {
                   if (!selected) return;
                   const user = getCurrentUser();
-                  const mode =
-                    selected.mode === "Ambas" ? chosenMode : selected.mode;
+                  const mode = selected.mode === "Ambas" ? chosenMode : selected.mode;
                   if (user)
                     addBooking(user.email, {
                       subject: subject.name,
                       tutor: selected.tutor,
-                      ...(selected.tutorEmail
-                        ? { tutorEmail: selected.tutorEmail }
-                        : {}),
+                      ...(selected.tutorEmail ? { tutorEmail: selected.tutorEmail } : {}),
                       student: `${user.primeiroNome} ${user.ultimoNome}`,
                       day: selected.day,
                       time: selected.time,

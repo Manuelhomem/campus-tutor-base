@@ -5,9 +5,7 @@
   "auth": {
     "type": "oauth",
     "issuer": "https://xvpfqlqtpbbvwsjgsygs.supabase.co/auth/v1",
-    "accepted_audiences": [
-      "authenticated"
-    ]
+    "accepted_audiences": ["authenticated"]
   },
   "mcp": {
     "server": {
@@ -51,9 +49,7 @@
               "description": "Subject slug from list_subjects, e.g. 'algoritmos'."
             }
           },
-          "required": [
-            "subject_slug"
-          ],
+          "required": ["subject_slug"],
           "additionalProperties": false
         },
         "outputSchema": null
@@ -90,27 +86,15 @@
             },
             "tutor_id": {
               "description": "tutor_id from the slot, if any.",
-              "type": [
-                "string",
-                "null"
-              ]
+              "type": ["string", "null"]
             },
             "mode": {
               "type": "string",
-              "enum": [
-                "Presencial",
-                "Online"
-              ],
+              "enum": ["Presencial", "Online"],
               "description": "Chosen modality."
             }
           },
-          "required": [
-            "subject_slug",
-            "day",
-            "time",
-            "tutor",
-            "mode"
-          ],
+          "required": ["subject_slug", "day", "time", "tutor", "mode"],
           "additionalProperties": false
         },
         "outputSchema": null

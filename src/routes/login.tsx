@@ -42,9 +42,8 @@ function LoginPage() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState<Partial<Record<keyof typeof form, string>>>({});
 
-  const set = (field: keyof typeof form) => (
-    e: React.ChangeEvent<HTMLInputElement>,
-  ) => setForm((prev) => ({ ...prev, [field]: e.target.value }));
+  const set = (field: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>
+    setForm((prev) => ({ ...prev, [field]: e.target.value }));
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -85,7 +84,8 @@ function LoginPage() {
             </span>
           </Link>
           <Link
-            to="/registo" search={{ redirect: search.redirect }}
+            to="/registo"
+            search={{ redirect: search.redirect }}
             className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
           >
             Ainda não tens conta? <span className="text-primary">Fazer Registo</span>
@@ -127,9 +127,7 @@ function LoginPage() {
                 placeholder="nome@iscte-iul.pt"
                 className={inputClass}
               />
-              {errors.email && (
-                <p className="mt-1.5 text-xs text-destructive">{errors.email}</p>
-              )}
+              {errors.email && <p className="mt-1.5 text-xs text-destructive">{errors.email}</p>}
             </div>
 
             <div>
@@ -164,7 +162,8 @@ function LoginPage() {
             <p className="text-center text-sm text-muted-foreground">
               Ainda não tens conta?{" "}
               <Link
-                to="/registo" search={{ redirect: search.redirect }}
+                to="/registo"
+                search={{ redirect: search.redirect }}
                 className="font-medium text-primary hover:underline"
               >
                 Fazer Registo

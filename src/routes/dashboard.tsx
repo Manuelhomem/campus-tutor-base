@@ -1,12 +1,37 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { CalendarDays, GraduationCap, LogOut, Plus, User } from "lucide-react";
-import { getBookings, getCurrentUser, getTutorSessions, logout, requireLogin, type Booking } from "@/lib/auth";
+import {
+  getBookings,
+  getCurrentUser,
+  getTutorSessions,
+  logout,
+  requireLogin,
+  type Booking,
+} from "@/lib/auth";
 import { DAYS } from "@/lib/booking-data";
 
 const MOCK_SESSIONS: Booking[] = [
-  { subject: "Matemática", tutor: "Ana Silva", day: "Terça, 29 set", time: "15:00", mode: "Online" },
-  { subject: "Programação", tutor: "João Pinto", day: "Quinta, 1 out", time: "14:30", mode: "Presencial" },
-  { subject: "Algoritmos", tutor: "Inês Cardoso", day: "Sexta, 2 out", time: "11:00", mode: "Presencial" },
+  {
+    subject: "Matemática",
+    tutor: "Ana Silva",
+    day: "Terça, 29 set",
+    time: "15:00",
+    mode: "Online",
+  },
+  {
+    subject: "Programação",
+    tutor: "João Pinto",
+    day: "Quinta, 1 out",
+    time: "14:30",
+    mode: "Presencial",
+  },
+  {
+    subject: "Algoritmos",
+    tutor: "Inês Cardoso",
+    day: "Sexta, 2 out",
+    time: "11:00",
+    mode: "Presencial",
+  },
 ];
 
 export const Route = createFileRoute("/dashboard")({
@@ -82,16 +107,25 @@ function DashboardPage() {
         {user.tipo === "tutor" ? (
           <div className="mt-10 grid gap-6 md:grid-cols-2">
             <section className="rounded-3xl border border-border bg-card p-6 shadow-sm sm:p-8">
-              <h2 className="font-display text-xl font-semibold text-foreground">Disciplinas que lecionas</h2>
+              <h2 className="font-display text-xl font-semibold text-foreground">
+                Disciplinas que lecionas
+              </h2>
               <div className="mt-5 flex flex-wrap gap-2">
                 {(user.disciplinas ?? []).map((d) => (
-                  <span key={d} className="rounded-full bg-accent px-3 py-1.5 text-sm font-medium text-primary">{d}</span>
+                  <span
+                    key={d}
+                    className="rounded-full bg-accent px-3 py-1.5 text-sm font-medium text-primary"
+                  >
+                    {d}
+                  </span>
                 ))}
               </div>
               {user.bio && <p className="mt-6 text-sm text-muted-foreground">{user.bio}</p>}
             </section>
             <section className="rounded-3xl border border-border bg-card p-6 shadow-sm sm:p-8">
-              <h2 className="font-display text-xl font-semibold text-foreground">A tua disponibilidade</h2>
+              <h2 className="font-display text-xl font-semibold text-foreground">
+                A tua disponibilidade
+              </h2>
               <ul className="mt-5 space-y-3">
                 {DAYS.map((d) => {
                   const hours = (user.disponibilidade ?? [])
@@ -103,7 +137,12 @@ function DashboardPage() {
                     <li key={d} className="flex flex-wrap items-center gap-2">
                       <span className="w-20 text-sm font-semibold text-foreground">{d}</span>
                       {hours.map((h) => (
-                        <span key={h} className="rounded-md border border-border px-2 py-0.5 text-xs text-muted-foreground">{h} · {user.disponibilidadeModo?.[`${d}|${h}`] ?? "Presencial"}</span>
+                        <span
+                          key={h}
+                          className="rounded-md border border-border px-2 py-0.5 text-xs text-muted-foreground"
+                        >
+                          {h} · {user.disponibilidadeModo?.[`${d}|${h}`] ?? "Presencial"}
+                        </span>
                       ))}
                     </li>
                   );
@@ -111,22 +150,32 @@ function DashboardPage() {
               </ul>
             </section>
             <section className="rounded-3xl border border-border bg-card p-6 shadow-sm sm:p-8 md:col-span-2">
-              <h2 className="font-display text-xl font-semibold text-foreground">Próximas Sessões Agendadas</h2>
+              <h2 className="font-display text-xl font-semibold text-foreground">
+                Próximas Sessões Agendadas
+              </h2>
               {getTutorSessions(user).length === 0 ? (
-                <p className="mt-4 text-sm text-muted-foreground">Ainda não tens sessões marcadas por alunos.</p>
+                <p className="mt-4 text-sm text-muted-foreground">
+                  Ainda não tens sessões marcadas por alunos.
+                </p>
               ) : (
                 <ul className="mt-6 divide-y divide-border">
                   {getTutorSessions(user).map((s, i) => (
                     <li key={i} className="flex flex-wrap items-center justify-between gap-4 py-4">
                       <div className="flex items-center gap-4">
-                        <span className="flex size-11 items-center justify-center rounded-xl bg-accent text-primary"><CalendarDays className="size-5" /></span>
+                        <span className="flex size-11 items-center justify-center rounded-xl bg-accent text-primary">
+                          <CalendarDays className="size-5" />
+                        </span>
                         <div>
                           <p className="font-semibold text-foreground">{s.subject}</p>
-                          <p className="flex items-center gap-1.5 text-sm text-muted-foreground"><User className="size-3.5" /> {s.student ?? "Aluno"}</p>
+                          <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                            <User className="size-3.5" /> {s.student ?? "Aluno"}
+                          </p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm font-semibold text-foreground">{s.day} · {s.time}</p>
+                        <p className="text-sm font-semibold text-foreground">
+                          {s.day} · {s.time}
+                        </p>
                         <p className="text-xs text-muted-foreground">{s.mode}</p>
                       </div>
                     </li>
@@ -136,32 +185,32 @@ function DashboardPage() {
             </section>
           </div>
         ) : (
-        <section className="mt-10 rounded-3xl border border-border bg-card p-6 shadow-sm sm:p-8">
-          <h2 className="font-display text-xl font-semibold text-foreground">Próximas Sessões</h2>
-          <ul className="mt-6 divide-y divide-border">
-            {sessions.map((s, i) => (
-              <li key={i} className="flex flex-wrap items-center justify-between gap-4 py-4">
-                <div className="flex items-center gap-4">
-                  <span className="flex size-11 items-center justify-center rounded-xl bg-accent text-primary">
-                    <CalendarDays className="size-5" />
-                  </span>
-                  <div>
-                    <p className="font-semibold text-foreground">{s.subject}</p>
-                    <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                      <User className="size-3.5" /> {s.tutor}
-                    </p>
+          <section className="mt-10 rounded-3xl border border-border bg-card p-6 shadow-sm sm:p-8">
+            <h2 className="font-display text-xl font-semibold text-foreground">Próximas Sessões</h2>
+            <ul className="mt-6 divide-y divide-border">
+              {sessions.map((s, i) => (
+                <li key={i} className="flex flex-wrap items-center justify-between gap-4 py-4">
+                  <div className="flex items-center gap-4">
+                    <span className="flex size-11 items-center justify-center rounded-xl bg-accent text-primary">
+                      <CalendarDays className="size-5" />
+                    </span>
+                    <div>
+                      <p className="font-semibold text-foreground">{s.subject}</p>
+                      <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                        <User className="size-3.5" /> {s.tutor}
+                      </p>
+                    </div>
                   </div>
-                </div>
-                <div className="text-right">
-                  <p className="text-sm font-semibold text-foreground">
-                    {s.day} · {s.time}
-                  </p>
-                  <p className="text-xs text-muted-foreground">{s.mode}</p>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </section>
+                  <div className="text-right">
+                    <p className="text-sm font-semibold text-foreground">
+                      {s.day} · {s.time}
+                    </p>
+                    <p className="text-xs text-muted-foreground">{s.mode}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </section>
         )}
       </main>
     </div>

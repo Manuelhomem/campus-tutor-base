@@ -1,0 +1,6 @@
+{
+  "name": "TutorIscte",
+  "description": "Explicações com tutores estudantes do ISCTE - Marca sessões de explicações de Matemática, Programação, Algoritmos e Desenvolvimento Ágil com colegas tutores do ISCTE.",
+  "permissions": [],
+  "capabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

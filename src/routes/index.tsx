@@ -116,7 +116,7 @@ const FAQS = [
   {
     question: "Como é que marco uma sessão?",
     answer:
-      "Clica em \"Marcar Sessão\", escolhe a disciplina e o horário que te der mais jeito, e recebe a confirmação por email. Podes remarcar ou cancelar até 12 horas antes.",
+      'Clica em "Marcar Sessão", escolhe a disciplina e o horário que te der mais jeito, e recebe a confirmação por email. Podes remarcar ou cancelar até 12 horas antes.',
   },
   {
     question: "As sessões são presenciais ou online?",
@@ -198,13 +198,11 @@ function Hero() {
             Por estudantes, para estudantes do ISCTE
           </span>
           <h1 className="mt-6 font-display text-4xl font-bold leading-tight tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-            Explicações com colegas que{" "}
-            <span className="text-primary">já lá passaram</span>
+            Explicações com colegas que <span className="text-primary">já lá passaram</span>
           </h1>
           <p className="mt-5 max-w-xl text-lg leading-relaxed text-muted-foreground">
-            Matemática, Programação, Algoritmos e Desenvolvimento Ágil. Marca
-            sessões de explicações com tutores estudantes do ISCTE e recupera o
-            controlo sobre as tuas notas.
+            Matemática, Programação, Algoritmos e Desenvolvimento Ágil. Marca sessões de explicações
+            com tutores estudantes do ISCTE e recupera o controlo sobre as tuas notas.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-4">
             <Link
@@ -249,8 +247,7 @@ function HowItWorks() {
             Como funciona
           </h2>
           <p className="mt-4 text-lg text-muted-foreground">
-            Três passos simples entre ti e uma sessão de explicações que vale a
-            pena.
+            Três passos simples entre ti e uma sessão de explicações que vale a pena.
           </p>
         </div>
         <ol className="mt-14 grid gap-6 md:grid-cols-3">
@@ -348,9 +345,7 @@ function Faq() {
                 {faq.question}
                 <ChevronDown className="size-5 shrink-0 text-muted-foreground transition-transform group-open:rotate-180" />
               </summary>
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                {faq.answer}
-              </p>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{faq.answer}</p>
             </details>
           ))}
         </div>
@@ -377,8 +372,7 @@ function FinalCta() {
               Pronto para melhorar as tuas notas?
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-lg text-primary-foreground/85">
-              Marca hoje a tua primeira sessão de explicações. A primeira é
-              por nossa conta.
+              Marca hoje a tua primeira sessão de explicações. A primeira é por nossa conta.
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
               <Link

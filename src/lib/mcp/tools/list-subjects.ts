@@ -9,6 +9,9 @@ export default defineTool({
   annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
   handler: () => {
     const subjects = BOOKING_SUBJECTS.map((s) => ({ slug: s.slug, name: s.name }));
-    return { content: [{ type: "text", text: JSON.stringify(subjects) }], structuredContent: { subjects } };
+    return {
+      content: [{ type: "text", text: JSON.stringify(subjects) }],
+      structuredContent: { subjects },
+    };
   },
 });

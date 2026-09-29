@@ -9,8 +9,7 @@ import {
 } from "lucide-react";
 
 /// Real booking calendar (Cal.com) used to confirm a tutoring session.
-export const CAL_BOOKING_URL =
-  "https://cal.com/manuel-homem-cufgzn/explicacoes";
+export const CAL_BOOKING_URL = "https://cal.com/manuel-homem-cufgzn/explicacoes";
 
 export type Slot = {
   day: string;
@@ -50,8 +49,7 @@ export const BOOKING_SUBJECTS: Subject[] = [
     slug: "direito",
     name: "Direito",
     icon: Scale,
-    description:
-      "Introdução ao Direito, Direito das Obrigações e casos práticos comentados.",
+    description: "Introdução ao Direito, Direito das Obrigações e casos práticos comentados.",
     topics: ["Direito Civil", "Casos Práticos", "Metodologia Jurídica"],
     slots: [
       { day: "Segunda", time: "14:00", tutor: "Miguel Faria", mode: "Presencial" },
@@ -78,8 +76,7 @@ export const BOOKING_SUBJECTS: Subject[] = [
     slug: "programacao",
     name: "Programação",
     icon: Code2,
-    description:
-      "Java, Python e boas práticas de código com tutores de Informática.",
+    description: "Java, Python e boas práticas de código com tutores de Informática.",
     topics: ["Java", "Python", "Programação Orientada a Objetos"],
     slots: [
       { day: "Terça", time: "10:00", tutor: "João Pinto", mode: "Presencial" },
@@ -93,8 +90,7 @@ export const BOOKING_SUBJECTS: Subject[] = [
     slug: "desenvolvimento-agil",
     name: "Desenvolvimento Ágil",
     icon: KanbanSquare,
-    description:
-      "Scrum, kanban e gestão de projetos de software para os trabalhos de grupo.",
+    description: "Scrum, kanban e gestão de projetos de software para os trabalhos de grupo.",
     topics: ["Scrum", "Kanban", "Metodologias"],
     slots: [
       { day: "Segunda", time: "18:00", tutor: "Marta Ribeiro", mode: "Online" },
@@ -106,8 +102,7 @@ export const BOOKING_SUBJECTS: Subject[] = [
     slug: "estatistica",
     name: "Estatística",
     icon: TrendingUp,
-    description:
-      "Probabilidades, inferência e análise de dados com apoio em R e SPSS.",
+    description: "Probabilidades, inferência e análise de dados com apoio em R e SPSS.",
     topics: ["Probabilidades", "Inferência", "R e SPSS"],
     slots: [
       { day: "Terça", time: "09:00", tutor: "Helena Costa", mode: "Presencial" },
