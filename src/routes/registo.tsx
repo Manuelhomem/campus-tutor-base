@@ -8,7 +8,7 @@ const HOURS = Array.from({ length: 12 }, (_, i) => `${String(i + 9).padStart(2, 
 
 export const Route = createFileRoute("/registo")({
   validateSearch: (s: Record<string, unknown>) => ({
-    redirect: typeof s.redirect === "string" && s.redirect.startsWith("/") && !s.redirect.startsWith("//") ? s.redirect : undefined,
+    redirect: typeof s["redirect"] === "string" && s["redirect"].startsWith("/") && !s["redirect"].startsWith("//") ? s["redirect"] : undefined,
   }),
   head: () => ({
     meta: [
