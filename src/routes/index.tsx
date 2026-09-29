@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
 import { useCurrentUser } from "@/lib/auth";
+import { FaqChatbot } from "@/components/FaqChatbot";
 import {
   BookOpenCheck,
   CalendarCheck,
@@ -428,6 +429,7 @@ function LandingPage() {
         <FinalCta />
       </main>
       <Footer />
+      <FaqChatbot />
     </div>
   );
 }
