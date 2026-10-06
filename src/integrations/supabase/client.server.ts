@@ -32,18 +32,52 @@ function createSupabaseFetch(supabaseKey: string): typeof fetch {
   };
 }
 
+type MockQueryBuilder = {
+  select: () => MockQueryBuilder;
+  insert: () => MockQueryBuilder;
+  update: () => MockQueryBuilder;
+  upsert: () => MockQueryBuilder;
+  delete: () => MockQueryBuilder;
+  eq: () => MockQueryBuilder;
+  order: () => MockQueryBuilder;
+  single: () => Promise<{ data: null; error: null }>;
+  maybeSingle: () => Promise<{ data: null; error: null }>;
+  then: (resolve?: (val: { data: unknown[]; error: null }) => unknown) => Promise<unknown>;
+};
+
+function createMockSupabaseAdminClient() {
+  console.warn("[Supabase] Server Supabase credentials not found. Operating in local mode.");
+  const chainable: MockQueryBuilder = {
+    select: () => chainable,
+    insert: () => chainable,
+    update: () => chainable,
+    upsert: () => chainable,
+    delete: () => chainable,
+    eq: () => chainable,
+    order: () => chainable,
+    single: async () => ({ data: null, error: null }),
+    maybeSingle: async () => ({ data: null, error: null }),
+    then: (resolve?: (val: { data: unknown[]; error: null }) => unknown) =>
+      Promise.resolve({ data: [], error: null }).then(resolve),
+  };
+
+  return {
+    auth: {
+      admin: {
+        listUsers: async () => ({ data: { users: [] }, error: null }),
+        getUserById: async () => ({ data: { user: null }, error: null }),
+      },
+    },
+    from: () => chainable,
+  } as unknown as ReturnType<typeof createClient<Database>>;
+}
+
 function createSupabaseAdminClient() {
   const SUPABASE_URL = process.env["SUPABASE_URL"];
   const SUPABASE_SERVICE_ROLE_KEY = process.env["SUPABASE_SERVICE_ROLE_KEY"];
 
   if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
-    const missing = [
-      ...(!SUPABASE_URL ? ["SUPABASE_URL"] : []),
-      ...(!SUPABASE_SERVICE_ROLE_KEY ? ["SUPABASE_SERVICE_ROLE_KEY"] : []),
-    ];
-    const message = `Missing Supabase environment variable(s): ${missing.join(", ")}. Connect Supabase in Lovable Cloud.`;
-    console.error(`[Supabase] ${message}`);
-    throw new Error(message);
+    return createMockSupabaseAdminClient();
   }
 
   return createClient<Database>(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {

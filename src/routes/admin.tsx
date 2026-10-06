@@ -270,6 +270,7 @@ function AdminPage() {
       loadCatalogo();
       loadConfigStatus();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser]);
 
   async function loadPedidos() {

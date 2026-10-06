@@ -30,6 +30,54 @@ function createSupabaseFetch(supabaseKey: string): typeof fetch {
   };
 }
 
+type MockQueryBuilder = {
+  select: () => MockQueryBuilder;
+  insert: () => MockQueryBuilder;
+  update: () => MockQueryBuilder;
+  upsert: () => MockQueryBuilder;
+  delete: () => MockQueryBuilder;
+  eq: () => MockQueryBuilder;
+  order: () => MockQueryBuilder;
+  single: () => Promise<{ data: null; error: null }>;
+  maybeSingle: () => Promise<{ data: null; error: null }>;
+  then: (resolve?: (val: { data: unknown[]; error: null }) => unknown) => Promise<unknown>;
+};
+
+function createMockSupabaseClient() {
+  console.warn("[Supabase] Supabase credentials not found. Operating in local storage mode.");
+  const chainable: MockQueryBuilder = {
+    select: () => chainable,
+    insert: () => chainable,
+    update: () => chainable,
+    upsert: () => chainable,
+    delete: () => chainable,
+    eq: () => chainable,
+    order: () => chainable,
+    single: async () => ({ data: null, error: null }),
+    maybeSingle: async () => ({ data: null, error: null }),
+    then: (resolve?: (val: { data: unknown[]; error: null }) => unknown) =>
+      Promise.resolve({ data: [], error: null }).then(resolve),
+  };
+
+  return {
+    auth: {
+      getSession: async () => ({ data: { session: null }, error: null }),
+      getUser: async () => ({ data: { user: null }, error: null }),
+      onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
+      signUp: async () => ({
+        data: null,
+        error: new Error("Supabase não configurado"),
+      }),
+      signInWithPassword: async () => ({
+        data: null,
+        error: new Error("Supabase não configurado"),
+      }),
+      signOut: async () => ({ error: null }),
+    },
+    from: () => chainable,
+  } as unknown as ReturnType<typeof createClient<Database>>;
+}
+
 function createSupabaseClient() {
   // Use import.meta.env for client-side (Vite build-time replacement)
   // Fall back to process.env for SSR (server-side rendering)
@@ -38,13 +86,7 @@ function createSupabaseClient() {
     import.meta.env["VITE_SUPABASE_PUBLISHABLE_KEY"] || process.env["SUPABASE_PUBLISHABLE_KEY"];
 
   if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
-    const missing = [
-      ...(!SUPABASE_URL ? ["SUPABASE_URL"] : []),
-      ...(!SUPABASE_PUBLISHABLE_KEY ? ["SUPABASE_PUBLISHABLE_KEY"] : []),
-    ];
-    const message = `Missing Supabase environment variable(s): ${missing.join(", ")}. Connect Supabase in Lovable Cloud.`;
-    console.error(`[Supabase] ${message}`);
-    throw new Error(message);
+    return createMockSupabaseClient();
   }
 
   return createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {

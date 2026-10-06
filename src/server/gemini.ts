@@ -144,17 +144,27 @@ ${pedidoText}
   let lastError = "";
 
   // Tentar chaves e modelos disponíveis
-  for (const apiKey of apiKeys) {
+  const keysToTry = apiKeys.length > 0 ? apiKeys : [process.env.GEMINI_API_KEY || ""];
+
+  for (const apiKey of keysToTry) {
     for (const modelName of candidateModels) {
       try {
-        const ai = new GoogleGenAI({
-          apiKey,
-          httpOptions: {
-            headers: {
-              "User-Agent": "aistudio-build",
-            },
-          },
-        });
+        const ai = apiKey
+          ? new GoogleGenAI({
+              apiKey,
+              httpOptions: {
+                headers: {
+                  "User-Agent": "aistudio-build",
+                },
+              },
+            })
+          : new GoogleGenAI({
+              httpOptions: {
+                headers: {
+                  "User-Agent": "aistudio-build",
+                },
+              },
+            });
 
         const response = await ai.models.generateContent({
           model: modelName,
