@@ -1,0 +1,235 @@
+{
+  "entities": {
+    "catalogo": {
+      "title": "Item do Catálogo",
+      "description": "Produtos e serviços de explicações disponíveis no catálogo",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Identificador único do item no catálogo",
+          "maxLength": 128
+        },
+        "nome": {
+          "type": "string",
+          "description": "Nome da disciplina ou serviço",
+          "maxLength": 200
+        },
+        "descricao": {
+          "type": "string",
+          "description": "Descrição detalhada do serviço",
+          "maxLength": 1000
+        },
+        "unidade": {
+          "type": "string",
+          "description": "Unidade de venda (hora, unidade ou pacote)",
+          "enum": ["hora", "unidade", "pacote"]
+        },
+        "precoUnitario": {
+          "type": "integer",
+          "description": "Preço unitário em cêntimos de euro"
+        },
+        "moeda": {
+          "type": "string",
+          "description": "Moeda de faturação",
+          "enum": ["EUR"]
+        },
+        "ativo": {
+          "type": "boolean",
+          "description": "Se o item está disponível no catálogo ativo"
+        },
+        "condicoes": {
+          "type": "string",
+          "description": "Condições de aplicação ou limitações",
+          "maxLength": 1000
+        },
+        "isDemo": {
+          "type": "boolean",
+          "description": "Identificador de item fictício de demonstração"
+        }
+      },
+      "required": ["nome", "unidade", "precoUnitario", "moeda", "ativo"]
+    },
+    "pedidos": {
+      "title": "Pedido de Proposta",
+      "description": "Pedido submetido por um aluno interessado",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Identificador do pedido",
+          "maxLength": 128
+        },
+        "nome": {
+          "type": "string",
+          "description": "Nome do requerente",
+          "maxLength": 150
+        },
+        "email": {
+          "type": "string",
+          "description": "Email de contacto do aluno",
+          "maxLength": 200
+        },
+        "pedido": {
+          "type": "string",
+          "description": "Texto descritivo do pedido",
+          "maxLength": 5000
+        },
+        "status": {
+          "type": "string",
+          "description": "Estado de processamento",
+          "enum": ["Recebido", "Em análise", "Necessita de revisão", "Proposta criada", "Erro"]
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Data de criação ISO 8601"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Data da última atualização ISO 8601"
+        },
+        "interpretacao": {
+          "type": "object",
+          "description": "Interpretação estruturada gerada pelo modelo Gemini"
+        },
+        "informacaoEmFalta": {
+          "type": "array",
+          "description": "Lista de questões ou dados em falta"
+        },
+        "motivoRevisao": {
+          "type": "string",
+          "description": "Motivo da necessidade de revisão humana",
+          "maxLength": 1000
+        },
+        "propostaId": {
+          "type": "string",
+          "description": "ID da proposta gerada para o pedido",
+          "maxLength": 128
+        },
+        "propostaToken": {
+          "type": "string",
+          "description": "Token de acesso público à proposta gerada",
+          "maxLength": 128
+        },
+        "erro": {
+          "type": "string",
+          "description": "Mensagem de erro de processamento se existente",
+          "maxLength": 1000
+        }
+      },
+      "required": ["nome", "email", "pedido", "status", "createdAt"]
+    },
+    "propostas": {
+      "title": "Proposta Comercial",
+      "description": "Proposta orçamental calculada para um pedido",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Identificador único da proposta",
+          "maxLength": 128
+        },
+        "numero": {
+          "type": "string",
+          "description": "Número formal da proposta (ex. PROP-2026-0001)",
+          "maxLength": 50
+        },
+        "pedidoId": {
+          "type": "string",
+          "description": "Identificador do pedido de origem",
+          "maxLength": 128
+        },
+        "token": {
+          "type": "string",
+          "description": "Token aleatório seguro e não previsível para acesso público",
+          "maxLength": 128
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Data de emissão da proposta"
+        },
+        "validadeAte": {
+          "type": "string",
+          "description": "Data de expiração da validade da proposta"
+        },
+        "resumo": {
+          "type": "string",
+          "description": "Resumo do âmbito da proposta",
+          "maxLength": 1000
+        },
+        "itens": {
+          "type": "array",
+          "description": "Lista de itens com snapshot dos dados de catálogo"
+        },
+        "total": {
+          "type": "integer",
+          "description": "Total sem IVA em cêntimos"
+        },
+        "condicoes": {
+          "type": "string",
+          "description": "Condições aplicáveis",
+          "maxLength": 2000
+        },
+        "isDemo": {
+          "type": "boolean",
+          "description": "Indicação se a proposta é de demonstração com preços fictícios"
+        },
+        "notificacao": {
+          "type": "object",
+          "description": "Estado e histórico do envio de notificação por Resend"
+        }
+      },
+      "required": [
+        "numero",
+        "pedidoId",
+        "token",
+        "createdAt",
+        "validadeAte",
+        "resumo",
+        "itens",
+        "total"
+      ]
+    },
+    "admins": {
+      "title": "Administrador Autorizado",
+      "description": "Registo de utilizadores autorizados a gerir a aplicação",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "UID do utilizador no Firebase Auth",
+          "maxLength": 128
+        },
+        "email": {
+          "type": "string",
+          "description": "Email do administrador",
+          "maxLength": 200
+        },
+        "role": {
+          "type": "string",
+          "description": "Função administrativa",
+          "enum": ["admin"]
+        }
+      },
+      "required": ["email", "role"]
+    }
+  },
+  "firestore": {
+    "/catalogo/{catalogoId}": {
+      "schema": { "$ref": "#/entities/catalogo" },
+      "description": "Catálogo de serviços e preços de explicações"
+    },
+    "/pedidos/{pedidoId}": {
+      "schema": { "$ref": "#/entities/pedidos" },
+      "description": "Pedidos de proposta submetidos pelos alunos"
+    },
+    "/propostas/{propostaId}": {
+      "schema": { "$ref": "#/entities/propostas" },
+      "description": "Propostas calculadas e respetivos tokens de acesso"
+    },
+    "/admins/{adminId}": {
+      "schema": { "$ref": "#/entities/admins" },
+      "description": "Permissões de administradores da aplicação"
+    }
+  }
+}

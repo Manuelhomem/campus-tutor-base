@@ -1,0 +1,87 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global default-deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) ||
+        (request.auth.token.email_verified == true && request.auth.token.email == "mamfh@iscte-iul.pt")
+      );
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidCatalogo(data) {
+      return data.keys().hasAll(['nome', 'unidade', 'precoUnitario', 'moeda', 'ativo'])
+        && data.nome is string && data.nome.size() > 0 && data.nome.size() <= 200
+        && data.unidade in ['hora', 'unidade', 'pacote']
+        && data.precoUnitario is int && data.precoUnitario >= 0
+        && data.moeda == 'EUR'
+        && data.ativo is bool;
+    }
+
+    function isValidPedido(data) {
+      return data.keys().hasAll(['nome', 'email', 'pedido', 'status'])
+        && data.nome is string && data.nome.size() > 0 && data.nome.size() <= 150
+        && data.email is string && data.email.size() > 3 && data.email.size() <= 200 && data.email.matches('^[^@]+@[^@]+\\.[^@]+$')
+        && data.pedido is string && data.pedido.size() > 0 && data.pedido.size() <= 5000
+        && data.status in ['Recebido', 'Em análise', 'Necessita de revisão', 'Proposta criada', 'Erro'];
+    }
+
+    function isValidProposta(data) {
+      return data.keys().hasAll(['numero', 'pedidoId', 'token', 'resumo', 'itens', 'total'])
+        && data.numero is string && data.numero.size() <= 50
+        && data.pedidoId is string && data.pedidoId.size() <= 128
+        && data.token is string && data.token.size() >= 16 && data.token.size() <= 128
+        && data.resumo is string && data.resumo.size() <= 1000
+        && data.total is int && data.total >= 0
+        && data.itens is list;
+    }
+
+    // 1. Catalogo collection (Knowledge Base)
+    match /catalogo/{catalogoId} {
+      allow get, list: if true;
+      allow create, update: if isValidId(catalogoId) && (isAdmin() || isValidCatalogo(incoming()));
+      allow delete: if isValidId(catalogoId) && isAdmin();
+    }
+
+    // 2. Pedidos collection (Submissões de pedidos de proposta)
+    match /pedidos/{pedidoId} {
+      allow get, list: if true;
+      allow create, update: if isValidId(pedidoId) && (isAdmin() || isValidPedido(incoming()));
+      allow delete: if isValidId(pedidoId) && isAdmin();
+    }
+
+    // 3. Propostas collection (Propostas comerciais calculadas)
+    match /propostas/{propostaId} {
+      allow get, list: if true;
+      allow create, update: if isValidId(propostaId) && (isAdmin() || isValidProposta(incoming()));
+      allow delete: if isValidId(propostaId) && isAdmin();
+    }
+
+    // 4. Admins collection
+    match /admins/{adminId} {
+      allow read, write: if isValidId(adminId) && isAdmin();
+    }
+  }
+}

@@ -13,6 +13,14 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  nitro: {
+    preset: "node-server",
+    output: {
+      dir: "dist",
+      publicDir: "dist/public",
+      serverDir: "dist/server",
+    },
+  },
   vite: {
     plugins: [mcpPlugin()],
   },

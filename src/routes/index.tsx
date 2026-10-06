@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
 import { useCurrentUser } from "@/lib/auth";
 import { FaqChatbot } from "@/components/FaqChatbot";
+import { PedidoPropostaForm } from "@/components/PedidoPropostaForm";
 import { CAL_BOOKING_URL } from "@/lib/booking-data";
 import {
   BookOpenCheck,
@@ -47,6 +48,7 @@ export const Route = createFileRoute("/")({
 const NAV_LINKS = [
   { label: "Como funciona", href: "#como-funciona" },
   { label: "Disciplinas", href: "#disciplinas" },
+  { label: "Pedir Proposta", href: "#pedido-proposta" },
   { label: "Agendamento", href: "#agendamento" },
   { label: "FAQ", href: "#faq" },
 ];
@@ -221,6 +223,12 @@ function Hero() {
             >
               Escolher disciplina
             </Link>
+            <a
+              href="#pedido-proposta"
+              className="rounded-full border border-primary/30 bg-primary/10 px-6 py-3.5 text-base font-semibold text-primary transition-colors hover:bg-primary/20"
+            >
+              Pedir proposta
+            </a>
             <a
               href="#como-funciona"
               className="rounded-full px-5 py-3.5 text-base font-medium text-muted-foreground transition-colors hover:text-foreground"
@@ -435,7 +443,7 @@ function Footer() {
         <p className="text-sm text-muted-foreground">
           Feito por estudantes, para estudantes do ISCTE.
         </p>
-        <div className="flex gap-6">
+        <div className="flex flex-wrap items-center gap-6">
           {NAV_LINKS.map((link) => (
             <a
               key={link.href}
@@ -459,6 +467,7 @@ function LandingPage() {
         <Hero />
         <HowItWorks />
         <Subjects />
+        <PedidoPropostaForm />
         <Faq />
         <FinalCta />
       </main>
